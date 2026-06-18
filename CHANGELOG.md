@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.2
+
+- Remove the duplicated internal Agent skill copy.
+- Embed directly from `skills/findo` through the `skills` package, keeping `skills/findo` as the single source of truth.
+- Update release checks to guard the single-source embed path instead of comparing mirrored files.
+
 ## v1.2.1
 
 - Move embedded skill implementation under `internal/skillcontent` instead of exposing it from the module root.

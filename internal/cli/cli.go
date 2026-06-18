@@ -19,6 +19,7 @@ import (
 	"github.com/geekjourneyx/findo/internal/source/bocha"
 	"github.com/geekjourneyx/findo/internal/source/volcengine"
 	"github.com/geekjourneyx/findo/internal/source/zhihu"
+	"github.com/geekjourneyx/findo/skills"
 )
 
 const (
@@ -249,7 +250,7 @@ func runSkills(p parsed, version string, stdout, stderr io.Writer) int {
 }
 
 func newSkillReader() (*skillcontent.Reader, error) {
-	fsys, err := skillcontent.EmbeddedSkills()
+	fsys, err := skills.EmbeddedSkills()
 	if err != nil {
 		return nil, fmt.Errorf("skill content not embedded in this build: %w", err)
 	}
