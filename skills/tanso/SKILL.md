@@ -1,26 +1,26 @@
 ---
-name: findo
+name: tanso
 description: >-
-  Use Findo, an Agent Native Go CLI for Chinese internet research. Use when the user asks to search Chinese web sources, Zhihu, Zhihu hotlists, Bocha, Volcengine Ark, Chinese internet topics, source-backed briefs, contradiction checks, counterintuitive topic discovery, popular answers, live provider testing, or current Chinese web signals.
+  Use Tanso, an AI Search CLI for exploring Chinese internet signals. Use when the user asks to search Chinese web sources, Zhihu, Zhihu hotlists, Bocha, Volcengine Ark, Chinese internet topics, source-backed briefs, contradiction checks, counterintuitive topic discovery, popular answers, live provider testing, or current Chinese web signals.
 ---
 
-# Findo
+# Tanso
 
-Use `findo` to retrieve Chinese internet sources through provider APIs and return source-backed answers. Prefer `--json` for agent workflows.
+Use `tanso` to explore Chinese internet signals through provider APIs and return source-backed answers. Prefer `--json` for agent workflows.
 
 ## Before Running
 
 Check availability:
 
 ```bash
-findo version
-findo config show --json
+tanso version
+tanso config show --json
 ```
 
-If `findo` is missing and the user asked for setup, install it:
+If `tanso` is missing and the user asked for setup, install it:
 
 ```bash
-npm install -g @geekjourneyx/findo
+npm install -g @geekjourneyx/tanso
 ```
 
 Never print `.env`, API keys, bearer tokens, raw config files, or CI secrets. Treat redacted config values as expected.
@@ -31,19 +31,19 @@ Use the narrowest source that matches the task:
 
 | Need | Command |
 | --- | --- |
-| Broad web evidence | `findo bocha "<query>" --json --limit 5` |
-| Web-grounded direct answer | `findo volc "<query>" --json --limit 1` |
-| Zhihu opinions and discussions | `findo zhihu "<query>" --json --limit 5` |
-| Zhihu-backed global web search | `findo zhihu web "<query>" --json --limit 5` |
-| Current Zhihu hotlist | `findo hot zhihu --json` |
-| Available source IDs | `findo sources --json` |
+| Broad web evidence | `tanso bocha "<query>" --json --limit 5` |
+| Web-grounded direct answer | `tanso volc "<query>" --json --limit 1` |
+| Zhihu opinions and discussions | `tanso zhihu "<query>" --json --limit 5` |
+| Zhihu-backed global web search | `tanso zhihu web "<query>" --json --limit 5` |
+| Current Zhihu hotlist | `tanso zhihu hot --json` |
+| Available source IDs | `tanso sources --json` |
 
 Use Zhihu for opinion-rich questions, Bocha for broad corroboration, Volcengine for synthesized direct answers, and hotlist for current attention.
 
 For Zhihu global search only, filters are valid:
 
 ```bash
-findo zhihu web "<query>" --filter 'host=="example.com"' --search-db realtime --json
+tanso zhihu web "<query>" --filter 'host=="example.com"' --search-db realtime --json
 ```
 
 ## Research Workflow
@@ -98,8 +98,8 @@ When one provider fails, continue with configured alternatives if the user asked
 
 ## Guardrails
 
-- Do not scrape browsers or websites when a Findo provider can answer the task.
-- Do not use `--filter` or `--search-db` outside `findo zhihu web`.
-- Do not treat `findo sources --json` as proof that credentials work; it is only source inventory.
+- Do not scrape browsers or websites when a Tanso provider can answer the task.
+- Do not use `--filter` or `--search-db` outside `tanso zhihu web`.
+- Do not treat `tanso sources --json` as proof that credentials work; it is only source inventory.
 - Do not present one provider's output as verified fact when sources conflict.
 - Do not expand a narrow question into broad trend research unless the user asks for topic discovery.

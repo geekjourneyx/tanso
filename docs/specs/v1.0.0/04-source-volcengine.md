@@ -4,7 +4,7 @@
 
 Specify the Volcengine Ark answer adapter using the working reference implementation in `/root/go/src/industry-research/researcher`.
 
-Findo should expose Volcengine as a web-grounded answer source, not as a general chat interface.
+Tanso should expose Volcengine as a web-grounded answer source, not as a general chat interface.
 
 ## Volcengine Ark Answer
 
@@ -25,11 +25,11 @@ CapabilityAnswer
 ### Commands
 
 ```bash
-findo volc "2026 AI 搜索趋势"
-findo volc answer "2026 AI 搜索趋势" --json
+tanso volc "2026 AI 搜索趋势"
+tanso volc answer "2026 AI 搜索趋势" --json
 ```
 
-`findo volc` is an alias for `findo volc answer`.
+`tanso volc` is an alias for `tanso volc answer`.
 
 ### Endpoint
 
@@ -125,7 +125,7 @@ If no `web_search_call` exists, return:
 NO_RETRIEVAL_TRIGGERED
 ```
 
-This behavior comes from the reference project and is important. Without it, Findo could present a model-only answer as if it were web-grounded.
+This behavior comes from the reference project and is important. Without it, Tanso could present a model-only answer as if it were web-grounded.
 
 ### Response Mapping
 
@@ -162,7 +162,7 @@ Citation{
 }
 ```
 
-Findo v1.0.0 must keep citations inside the answer result. It must not emit separate citation results in the stable JSON envelope.
+Tanso v1.0.0 must keep citations inside the answer result. It must not emit separate citation results in the stable JSON envelope.
 
 ### Usage Metadata
 
@@ -172,7 +172,7 @@ It does not enter the stable v1.0.0 result schema unless a specific user-facing 
 
 ### Error Mapping
 
-| Provider condition | Findo code | Retryable |
+| Provider condition | Tanso code | Retryable |
 | --- | --- | --- |
 | missing local API key | `CREDENTIAL_MISSING` | false |
 | HTTP 400 | `INVALID_ARGUMENT` | false |
@@ -189,7 +189,7 @@ For 401/403, the error message should mention both credential validity and web s
 ### Smoke Command
 
 ```bash
-ARK_API_KEY=... findo volc "瑞幸咖啡 2026 门店数是否可信" --json
+ARK_API_KEY=... tanso volc "瑞幸咖啡 2026 门店数是否可信" --json
 ```
 
 Smoke assertions:

@@ -4,7 +4,7 @@
 
 Specify the Bocha web search adapter using the working reference implementation in `/root/go/src/industry-research/researcher`.
 
-Findo should preserve Bocha behavior that affects correctness, but normalize responses into Findo's result and error contracts.
+Tanso should preserve Bocha behavior that affects correctness, but normalize responses into Tanso's result and error contracts.
 
 ## Bocha Web Search
 
@@ -25,8 +25,8 @@ CapabilityWebSearch
 ### Command
 
 ```bash
-findo bocha "AI Agent 商业化"
-findo bocha "AI Agent 商业化" --json
+tanso bocha "AI Agent 商业化"
+tanso bocha "AI Agent 商业化" --json
 ```
 
 ### Endpoint
@@ -69,12 +69,12 @@ Minimum request body:
 }
 ```
 
-Optional Findo-controlled fields:
+Optional Tanso-controlled fields:
 
-- `--limit` is applied by Findo after decoding provider results.
+- `--limit` is applied by Tanso after decoding provider results.
 - provider-specific fields may be added only after they are represented by typed config or typed query fields.
 
-The reference project sends `summary: true` by default. Findo should keep this default because summaries improve terminal and Markdown usefulness.
+The reference project sends `summary: true` by default. Tanso should keep this default because summaries improve terminal and Markdown usefulness.
 
 Bocha v1.0.0 does not rely on provider-side count support. `source_status.effective_limit` equals the requested CLI/config limit for `bocha_web`.
 
@@ -118,7 +118,7 @@ Provider fields that may be preserved in raw/debug mode:
 
 The reference implementation normalizes `dateLastCrawled` values ending in `Z` to `+08:00`.
 
-Findo should not put `last_crawled_at` in the stable v1.0.0 result schema. If exposed later, it must be normalized consistently.
+Tanso should not put `last_crawled_at` in the stable v1.0.0 result schema. If exposed later, it must be normalized consistently.
 
 ### Success Criteria
 
@@ -134,7 +134,7 @@ Zero results is not a provider error by itself. It becomes `NO_RESULTS` only if 
 
 Provider code may be string, number, or absent. Normalize before comparison.
 
-| Provider condition | Findo code | Retryable |
+| Provider condition | Tanso code | Retryable |
 | --- | --- | --- |
 | missing local API key | `CREDENTIAL_MISSING` | false |
 | HTTP 400 or provider `400` | `INVALID_ARGUMENT` | false |
@@ -147,12 +147,12 @@ Provider code may be string, number, or absent. Normalize before comparison.
 | invalid JSON in 2xx body | `SOURCE_BAD_RESPONSE` | false |
 | context deadline | `SOURCE_TIMEOUT` | true |
 
-The reference project maps Bocha 403 to quota exhaustion. Findo v1.0.0 does not expose a separate quota code; put provider status and message in error details.
+The reference project maps Bocha 403 to quota exhaustion. Tanso v1.0.0 does not expose a separate quota code; put provider status and message in error details.
 
 ### Smoke Command
 
 ```bash
-BOCHA_API_KEY=... findo bocha "瑞幸咖啡 2026 门店数" --json
+BOCHA_API_KEY=... tanso bocha "瑞幸咖啡 2026 门店数" --json
 ```
 
 Smoke assertions:

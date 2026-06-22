@@ -1,6 +1,6 @@
 package search
 
-import "github.com/geekjourneyx/findo/internal/findoerr"
+import "github.com/geekjourneyx/tanso/internal/tansoerr"
 
 func Decide(statuses []SourceStatus) (Status, string, int) {
 	hasOK := false
@@ -23,7 +23,7 @@ func Decide(statuses []SourceStatus) (Status, string, int) {
 		return StatusPartial, code, 1
 	}
 
-	return StatusError, code, findoerr.ExitCodeForCode(code)
+	return StatusError, code, tansoerr.ExitCodeForCode(code)
 }
 
 func firstFailureCode(statuses []SourceStatus) string {
@@ -34,7 +34,7 @@ func firstFailureCode(statuses []SourceStatus) string {
 		if st.Error != nil && st.Error.Code != "" {
 			return st.Error.Code
 		}
-		return findoerr.NoResults
+		return tansoerr.NoResults
 	}
-	return findoerr.NoResults
+	return tansoerr.NoResults
 }

@@ -1,6 +1,6 @@
 package source
 
-import "github.com/geekjourneyx/findo/internal/search"
+import "github.com/geekjourneyx/tanso/internal/search"
 
 type Info struct {
 	Source         search.SourceID     `json:"source"`

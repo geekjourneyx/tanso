@@ -5,20 +5,20 @@ const path = require("path");
 const { execFileSync } = require("child_process");
 
 const ext = process.platform === "win32" ? ".exe" : "";
-const binaryPath = path.join(__dirname, "..", "bin", `findo${ext}`);
+const binaryPath = path.join(__dirname, "..", "bin", `tanso${ext}`);
 const skillsPath = path.join(__dirname, "..", "skills");
 
 if (!fs.existsSync(binaryPath)) {
   console.error(
-    "findo binary is missing. Reinstall with `npm install -g @geekjourneyx/findo`."
+    "tanso binary is missing. Reinstall with `npm install -g @geekjourneyx/tanso`."
   );
   process.exit(1);
 }
 
 try {
   const env = { ...process.env };
-  if (!env.FINDO_SKILLS_DIR && fs.existsSync(skillsPath)) {
-    env.FINDO_SKILLS_DIR = skillsPath;
+  if (!env.TANSO_SKILLS_DIR && fs.existsSync(skillsPath)) {
+    env.TANSO_SKILLS_DIR = skillsPath;
   }
   execFileSync(binaryPath, process.argv.slice(2), { stdio: "inherit", env });
 } catch (error) {
@@ -26,6 +26,6 @@ try {
     process.exit(error.status);
   }
 
-  console.error(`Failed to launch findo: ${error.message}`);
+  console.error(`Failed to launch tanso: ${error.message}`);
   process.exit(1);
 }

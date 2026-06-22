@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/geekjourneyx/findo/internal/findoerr"
-	"github.com/geekjourneyx/findo/internal/search"
+	"github.com/geekjourneyx/tanso/internal/search"
+	"github.com/geekjourneyx/tanso/internal/tansoerr"
 )
 
 const DefaultEndpointBase = "https://developer.zhihu.com/api/v1/content"
@@ -93,7 +93,7 @@ func (c Client) Hotlist(ctx context.Context, query search.HotlistQuery) ([]searc
 
 func (c Client) search(ctx context.Context, path string, source search.SourceID, limit int, query search.SearchQuery) ([]search.Result, error) {
 	if strings.TrimSpace(query.Text) == "" {
-		return nil, findoerr.Error{Code: findoerr.InvalidArgument, Message: "zhihu query is required", Source: string(source)}
+		return nil, tansoerr.Error{Code: tansoerr.InvalidArgument, Message: "zhihu query is required", Source: string(source)}
 	}
 	if err := c.validateSecret(source); err != nil {
 		return nil, err
@@ -142,8 +142,8 @@ func (c Client) validateSecret(source search.SourceID) error {
 	if strings.TrimSpace(c.AccessSecret) != "" {
 		return nil
 	}
-	return findoerr.Error{
-		Code:    findoerr.CredentialMissing,
+	return tansoerr.Error{
+		Code:    tansoerr.CredentialMissing,
 		Message: "zhihu access secret is required",
 		Source:  string(source),
 	}
@@ -152,7 +152,7 @@ func (c Client) validateSecret(source search.SourceID) error {
 func (c Client) get(ctx context.Context, endpoint string, source search.SourceID, out any) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
-		return findoerr.Error{Code: findoerr.InvalidArgument, Message: "invalid zhihu endpoint", Source: string(source)}
+		return tansoerr.Error{Code: tansoerr.InvalidArgument, Message: "invalid zhihu endpoint", Source: string(source)}
 	}
 	req.Header.Set("Authorization", "Bearer "+c.AccessSecret)
 	req.Header.Set("X-Request-Timestamp", strconv.FormatInt(time.Now().Unix(), 10))
@@ -168,8 +168,8 @@ func (c Client) get(ctx context.Context, endpoint string, source search.SourceID
 		return httpStatusError(resp.StatusCode, source)
 	}
 	if err := json.NewDecoder(resp.Body).Decode(out); err != nil {
-		return findoerr.Error{
-			Code:           findoerr.SourceBadResponse,
+		return tansoerr.Error{
+			Code:           tansoerr.SourceBadResponse,
 			Message:        "zhihu returned invalid JSON",
 			Source:         string(source),
 			ProviderStatus: resp.StatusCode,
@@ -225,21 +225,21 @@ func validateSearchDB(value string) error {
 	case "", "all", "realtime", "static":
 		return nil
 	default:
-		return findoerr.Error{Code: findoerr.InvalidArgument, Message: "invalid zhihu SearchDB", Source: string(search.SourceZhihuWeb)}
+		return tansoerr.Error{Code: tansoerr.InvalidArgument, Message: "invalid zhihu SearchDB", Source: string(search.SourceZhihuWeb)}
 	}
 }
 
 func requestError(ctx context.Context, err error, source search.SourceID) error {
 	if ctx.Err() != nil || errors.Is(err, context.DeadlineExceeded) || os.IsTimeout(err) || isTimeout(err) {
-		return findoerr.Error{
-			Code:      findoerr.SourceTimeout,
+		return tansoerr.Error{
+			Code:      tansoerr.SourceTimeout,
 			Message:   "zhihu request timed out",
 			Source:    string(source),
 			Retryable: true,
 		}
 	}
-	return findoerr.Error{
-		Code:      findoerr.SourceUnavailable,
+	return tansoerr.Error{
+		Code:      tansoerr.SourceUnavailable,
 		Message:   "zhihu request failed",
 		Source:    string(source),
 		Retryable: true,
@@ -251,7 +251,7 @@ func requestError(ctx context.Context, err error, source search.SourceID) error 
 
 func httpStatusError(status int, source search.SourceID) error {
 	code, retryable := mapHTTPStatus(status)
-	return findoerr.Error{
+	return tansoerr.Error{
 		Code:           code,
 		Message:        http.StatusText(status),
 		Source:         string(source),
@@ -261,12 +261,12 @@ func httpStatusError(status int, source search.SourceID) error {
 }
 
 func providerCodeError(code int, message string, source search.SourceID, status int) error {
-	findoCode, retryable := mapProviderCode(code)
+	tansoCode, retryable := mapProviderCode(code)
 	if message == "" {
 		message = "zhihu provider returned an error"
 	}
-	return findoerr.Error{
-		Code:           findoCode,
+	return tansoerr.Error{
+		Code:           tansoCode,
 		Message:        message,
 		Source:         string(source),
 		ProviderStatus: status,
@@ -278,30 +278,30 @@ func providerCodeError(code int, message string, source search.SourceID, status 
 func mapHTTPStatus(status int) (string, bool) {
 	switch {
 	case status == http.StatusBadRequest:
-		return findoerr.InvalidArgument, false
+		return tansoerr.InvalidArgument, false
 	case status == http.StatusUnauthorized || status == http.StatusForbidden:
-		return findoerr.SourceUnauthorized, false
+		return tansoerr.SourceUnauthorized, false
 	case status == http.StatusTooManyRequests:
-		return findoerr.SourceRateLimited, true
+		return tansoerr.SourceRateLimited, true
 	case status >= 500:
-		return findoerr.SourceUnavailable, true
+		return tansoerr.SourceUnavailable, true
 	default:
-		return findoerr.SourceBadResponse, false
+		return tansoerr.SourceBadResponse, false
 	}
 }
 
 func mapProviderCode(code int) (string, bool) {
 	switch code {
 	case 10001:
-		return findoerr.InvalidArgument, false
+		return tansoerr.InvalidArgument, false
 	case 20001:
-		return findoerr.SourceUnauthorized, false
+		return tansoerr.SourceUnauthorized, false
 	case 30001:
-		return findoerr.SourceRateLimited, true
+		return tansoerr.SourceRateLimited, true
 	case 90001:
-		return findoerr.SourceUnavailable, true
+		return tansoerr.SourceUnavailable, true
 	default:
-		return findoerr.SourceBadResponse, false
+		return tansoerr.SourceBadResponse, false
 	}
 }
 

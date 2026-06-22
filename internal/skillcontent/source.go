@@ -8,7 +8,7 @@ import (
 	"runtime"
 )
 
-const EnvSkillsDir = "FINDO_SKILLS_DIR"
+const EnvSkillsDir = "TANSO_SKILLS_DIR"
 
 // OpenFS returns an fs rooted at the skills directory. The content source is
 // always the repository/package-level skills directory; internal code only
@@ -26,7 +26,7 @@ func OpenFS() (fs.FS, error) {
 	if dir := findSkillsFromSourceFile(); dir != "" {
 		return openSkillsDir(dir)
 	}
-	return nil, fmt.Errorf("set %s to the directory containing findo/SKILL.md", EnvSkillsDir)
+	return nil, fmt.Errorf("set %s to the directory containing tanso/SKILL.md", EnvSkillsDir)
 }
 
 func openSkillsDir(dir string) (fs.FS, error) {
@@ -34,8 +34,8 @@ func openSkillsDir(dir string) (fs.FS, error) {
 	if err != nil {
 		return nil, err
 	}
-	if _, err := os.Stat(filepath.Join(cleaned, "findo", "SKILL.md")); err != nil {
-		return nil, fmt.Errorf("%s does not contain findo/SKILL.md", cleaned)
+	if _, err := os.Stat(filepath.Join(cleaned, "tanso", "SKILL.md")); err != nil {
+		return nil, fmt.Errorf("%s does not contain tanso/SKILL.md", cleaned)
 	}
 	return os.DirFS(cleaned), nil
 }
@@ -71,7 +71,7 @@ func findSkillsInAncestors(start string) string {
 	}
 	for {
 		candidate := filepath.Join(dir, "skills")
-		if _, err := os.Stat(filepath.Join(candidate, "findo", "SKILL.md")); err == nil {
+		if _, err := os.Stat(filepath.Join(candidate, "tanso", "SKILL.md")); err == nil {
 			return candidate
 		}
 		parent := filepath.Dir(dir)

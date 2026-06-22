@@ -1,4 +1,4 @@
-module github.com/geekjourneyx/findo
+module github.com/geekjourneyx/tanso
 
 go 1.23
 

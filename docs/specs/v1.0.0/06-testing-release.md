@@ -2,7 +2,7 @@
 
 ## Goal
 
-Define the quality gates needed to ship `findo v1.0.0` as a reliable Go CLI.
+Define the quality gates needed to ship `tanso v1.0.0` as a reliable Go CLI.
 
 This spec follows `go-cli-ship`: stable CLI contract, testable output, release artifacts, checksums, and README quality.
 
@@ -13,7 +13,7 @@ This spec follows `go-cli-ship`: stable CLI contract, testable output, release a
 Required packages:
 
 - `internal/config`
-- `internal/findoerr`
+- `internal/tansoerr`
 - `internal/output`
 - `internal/search`
 - `internal/source/bocha`
@@ -68,17 +68,17 @@ Use a testable `cli.Run(args, version, stdout, stderr)` function, following the 
 Required cases:
 
 ```text
-findo help
-findo version
-findo sources --json
-findo config
-findo bocha --json
-findo bocha "query" --json with missing key
-findo volc "query" --json with missing key
-findo zhihu "query" --json with missing key
-findo zhihu web "query" --json with missing key
-findo hot zhihu --json with missing key
-findo all "query" --json with one provider failure
+tanso help
+tanso version
+tanso sources --json
+tanso config
+tanso bocha --json
+tanso bocha "query" --json with missing key
+tanso volc "query" --json with missing key
+tanso zhihu "query" --json with missing key
+tanso zhihu web "query" --json with missing key
+tanso zhihu hot --json with missing key
+tanso all "query" --json with one provider failure
 unknown command
 missing query
 invalid --limit
@@ -93,9 +93,9 @@ mutually exclusive output flags
 E2E tests build and execute the binary:
 
 ```bash
-go build -trimpath -o /tmp/findo-e2e ./cmd/findo
-/tmp/findo-e2e version
-/tmp/findo-e2e sources --json
+go build -trimpath -o /tmp/tanso-e2e ./cmd/tanso
+/tmp/tanso-e2e version
+/tmp/tanso-e2e sources --json
 ```
 
 E2E tests must not require real credentials by default.
@@ -237,7 +237,7 @@ VERSION ?= 1.0.0
 LDFLAGS := -s -w -X main.version=$(VERSION)
 
 build:
-	go build -trimpath -ldflags="$(LDFLAGS)" -o findo ./cmd/findo
+	go build -trimpath -ldflags="$(LDFLAGS)" -o tanso ./cmd/tanso
 
 test:
 	CGO_ENABLED=0 go test -count=1 ./...
@@ -293,16 +293,16 @@ Release workflow:
 Artifact naming:
 
 ```text
-findo_1.0.0_linux_amd64.tar.gz
-findo_1.0.0_linux_arm64.tar.gz
-findo_1.0.0_darwin_amd64.tar.gz
-findo_1.0.0_darwin_arm64.tar.gz
+tanso_1.0.0_linux_amd64.tar.gz
+tanso_1.0.0_linux_arm64.tar.gz
+tanso_1.0.0_darwin_amd64.tar.gz
+tanso_1.0.0_darwin_arm64.tar.gz
 SHA256SUMS
 ```
 
 Each archive should include:
 
-- `findo` binary
+- `tanso` binary
 - `README.md`
 - `LICENSE`
 
@@ -310,7 +310,7 @@ Each archive should include:
 
 README must answer in the first screen:
 
-1. What is Findo?
+1. What is Tanso?
 2. What command do I run first?
 3. What sources work today?
 4. How do I get JSON?

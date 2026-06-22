@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/geekjourneyx/findo/internal/findoerr"
-	"github.com/geekjourneyx/findo/internal/search"
+	"github.com/geekjourneyx/tanso/internal/search"
+	"github.com/geekjourneyx/tanso/internal/tansoerr"
 )
 
 func TestWriteJSONEnvelopeIncludesRequiredArraysAndEffectiveLimit(t *testing.T) {
@@ -28,7 +28,7 @@ func TestWriteJSONEnvelopeIncludesRequiredArraysAndEffectiveLimit(t *testing.T) 
 			DurationMS:     1,
 			Error:          nil,
 		}},
-		Errors: []findoerr.Error{},
+		Errors: []tansoerr.Error{},
 	}
 	var buf bytes.Buffer
 	if err := WriteJSON(&buf, env); err != nil {

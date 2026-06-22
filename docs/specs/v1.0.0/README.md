@@ -1,8 +1,8 @@
-# Findo v1.0.0 Specs
+# Tanso v1.0.0 Specs
 
 This directory turns `prd.md` into implementation-facing specs.
 
-The reference project is `/root/go/src/industry-research/researcher`. It already implements Bocha direct search, Volcengine Ark Responses API with web search, config loading, provider error mapping, multi-provider partial failure, and release scripts. Findo should reuse the proven ideas, not the researcher product semantics.
+The reference project is `/root/go/src/industry-research/researcher`. It already implements Bocha direct search, Volcengine Ark Responses API with web search, config loading, provider error mapping, multi-provider partial failure, and release scripts. Tanso should reuse the proven ideas, not the researcher product semantics.
 
 ## Spec Index
 
@@ -15,7 +15,7 @@ The reference project is `/root/go/src/industry-research/researcher`. It already
 
 ## Scope of This First Batch
 
-This first batch covers the foundation, the two source families already proven in the reference project, and the official Zhihu API details supplied for Findo:
+This first batch covers the foundation, the two source families already proven in the reference project, and the official Zhihu API details supplied for Tanso:
 
 - Bocha web search
 - Volcengine Ark web-enhanced answer

@@ -2,11 +2,11 @@
   {
     "id": 1,
     "prompt": "搜一下知乎，帮我找 10 个反直觉、颠覆认知的程序员话题，看看热门回答都在说什么。",
-    "expected": "Uses findo zhihu or findo zhihu web with JSON output, summarizes topic candidates with sources, and separates evidence from inference."
+    "expected": "Uses tanso zhihu or tanso zhihu web with JSON output, summarizes topic candidates with sources, and separates evidence from inference."
   },
   {
     "id": 2,
-    "prompt": "帮我检查当前 findo 是否已经配置好，分别用最小 limit 测一下知乎、Bocha 和火山引擎能不能正常返回，但不要读取或输出任何密钥。",
+    "prompt": "帮我检查当前 tanso 是否已经配置好，分别用最小 limit 测一下知乎、Bocha 和火山引擎能不能正常返回，但不要读取或输出任何密钥。",
     "expected": "Checks version and redacted config, runs minimal provider smoke calls with --limit 1, reports provider statuses, and avoids reading or exposing secrets."
   },
   {

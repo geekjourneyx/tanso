@@ -1,4 +1,4 @@
-package findoerr
+package tansoerr
 
 import "testing"
 

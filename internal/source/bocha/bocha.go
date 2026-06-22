@@ -12,8 +12,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/geekjourneyx/findo/internal/findoerr"
-	"github.com/geekjourneyx/findo/internal/search"
+	"github.com/geekjourneyx/tanso/internal/search"
+	"github.com/geekjourneyx/tanso/internal/tansoerr"
 )
 
 const (
@@ -53,8 +53,8 @@ func (c *Client) Capabilities() []search.Capability {
 
 func (c *Client) Search(ctx context.Context, query search.SearchQuery) ([]search.Result, error) {
 	if strings.TrimSpace(c.APIKey) == "" {
-		return nil, findoerr.Error{
-			Code:    findoerr.CredentialMissing,
+		return nil, tansoerr.Error{
+			Code:    tansoerr.CredentialMissing,
 			Message: "bocha API key is required",
 			Source:  sourceName,
 		}
@@ -65,8 +65,8 @@ func (c *Client) Search(ctx context.Context, query search.SearchQuery) ([]search
 		"summary": true,
 	})
 	if err != nil {
-		return nil, findoerr.Error{
-			Code:    findoerr.InternalError,
+		return nil, tansoerr.Error{
+			Code:    tansoerr.InternalError,
 			Message: "failed to encode bocha request",
 			Source:  sourceName,
 		}
@@ -74,8 +74,8 @@ func (c *Client) Search(ctx context.Context, query search.SearchQuery) ([]search
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.endpoint(), bytes.NewReader(body))
 	if err != nil {
-		return nil, findoerr.Error{
-			Code:    findoerr.InvalidArgument,
+		return nil, tansoerr.Error{
+			Code:    tansoerr.InvalidArgument,
 			Message: "invalid bocha endpoint",
 			Source:  sourceName,
 		}
@@ -95,8 +95,8 @@ func (c *Client) Search(ctx context.Context, query search.SearchQuery) ([]search
 
 	var decoded apiResponse
 	if err := json.NewDecoder(resp.Body).Decode(&decoded); err != nil {
-		return nil, findoerr.Error{
-			Code:           findoerr.SourceBadResponse,
+		return nil, tansoerr.Error{
+			Code:           tansoerr.SourceBadResponse,
 			Message:        "bocha returned invalid JSON",
 			Source:         sourceName,
 			ProviderStatus: resp.StatusCode,
@@ -200,15 +200,15 @@ func (r apiResponse) providerMessage() string {
 
 func requestError(ctx context.Context, err error) error {
 	if ctx.Err() != nil || errors.Is(err, context.DeadlineExceeded) || os.IsTimeout(err) {
-		return findoerr.Error{
-			Code:      findoerr.SourceTimeout,
+		return tansoerr.Error{
+			Code:      tansoerr.SourceTimeout,
 			Message:   "bocha request timed out",
 			Source:    sourceName,
 			Retryable: true,
 		}
 	}
-	return findoerr.Error{
-		Code:      findoerr.SourceTimeout,
+	return tansoerr.Error{
+		Code:      tansoerr.SourceTimeout,
 		Message:   "bocha request failed",
 		Source:    sourceName,
 		Retryable: true,
@@ -231,7 +231,7 @@ func httpStatusError(resp *http.Response) error {
 	}
 
 	code, retryable := mapProviderFailure(resp.StatusCode, providerCode, message)
-	return findoerr.Error{
+	return tansoerr.Error{
 		Code:           code,
 		Message:        message,
 		Source:         sourceName,
@@ -246,7 +246,7 @@ func providerError(resp apiResponse) error {
 	message := resp.providerMessage()
 	status := providerCodeAsStatus(providerCode)
 	code, retryable := mapProviderFailure(status, providerCode, message)
-	return findoerr.Error{
+	return tansoerr.Error{
 		Code:         code,
 		Message:      message,
 		Source:       sourceName,
@@ -279,19 +279,19 @@ func providerCodeAsStatus(providerCode string) int {
 func mapProviderFailure(status int, providerCode, message string) (string, bool) {
 	lower := strings.ToLower(message + " " + providerCode)
 	if strings.Contains(lower, "api key") || strings.Contains(lower, "token") || strings.Contains(lower, "credential") {
-		return findoerr.CredentialMissing, false
+		return tansoerr.CredentialMissing, false
 	}
 	switch {
 	case status == http.StatusBadRequest:
-		return findoerr.InvalidArgument, false
+		return tansoerr.InvalidArgument, false
 	case status == http.StatusUnauthorized || status == http.StatusForbidden:
-		return findoerr.SourceUnauthorized, false
+		return tansoerr.SourceUnauthorized, false
 	case status == http.StatusTooManyRequests:
-		return findoerr.SourceRateLimited, true
+		return tansoerr.SourceRateLimited, true
 	case status >= 500:
-		return findoerr.SourceUnavailable, true
+		return tansoerr.SourceUnavailable, true
 	default:
-		return findoerr.SourceBadResponse, true
+		return tansoerr.SourceBadResponse, true
 	}
 }
 

@@ -90,7 +90,7 @@ func DefaultPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(dir, "findo", "config.yaml"), nil
+	return filepath.Join(dir, "tanso", "config.yaml"), nil
 }
 
 func Load(opts Options) (Config, error) {

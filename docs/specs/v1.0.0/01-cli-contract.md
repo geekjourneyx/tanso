@@ -2,51 +2,51 @@
 
 ## Goal
 
-Define the stable public command contract for `findo v1.0.0`.
+Define the stable public command contract for `tanso v1.0.0`.
 
 The CLI is the product API. Command names, output shape, exit codes, and flag semantics must be treated as compatibility commitments after `v1.0.0`.
 
 ## Command Shape
 
 ```bash
-findo <query>
-findo all <query>
+tanso <query>
+tanso all <query>
 
-findo bocha <query>
+tanso bocha <query>
 
-findo volc <query>
-findo volc answer <query>
+tanso volc <query>
+tanso volc answer <query>
 
-findo zhihu <query>
-findo zhihu web <query>
-findo hot zhihu
+tanso zhihu <query>
+tanso zhihu web <query>
+tanso zhihu hot
 
-findo sources
-findo config
-findo init
-findo version
-findo help
+tanso sources
+tanso config
+tanso init
+tanso version
+tanso help
 ```
 
 ### v1.0.0 Command Matrix
 
 | Command | Source ID | Provider family | Capability | Output contract |
 | --- | --- | --- | --- | --- |
-| `findo <query>` | default query source IDs | mixed | `web_search`, `answer` | retrieval envelope, `query.mode=mixed` |
-| `findo all <query>` | all enabled query source IDs | mixed | `web_search`, `answer` | retrieval envelope, `query.mode=mixed` |
-| `findo bocha <query>` | `bocha_web` | `bocha` | `web_search` | stable envelope |
-| `findo volc <query>` | `volcengine_answer` | `volcengine` | `answer` | stable envelope |
-| `findo volc answer <query>` | `volcengine_answer` | `volcengine` | `answer` | stable envelope |
-| `findo zhihu <query>` | `zhihu_search` | `zhihu` | `web_search` | stable envelope |
-| `findo zhihu web <query>` | `zhihu_web` | `zhihu` | `web_search` | stable envelope |
-| `findo hot zhihu` | `zhihu_hot` | `zhihu` | `hotlist` | stable envelope |
-| `findo sources` | n/a | mixed | inspection | stable envelope with source status |
-| `findo config` | n/a | mixed | inspection | redacted human output; JSON when `--json` |
-| `findo init` | n/a | mixed | config creation | human output |
-| `findo version` | n/a | n/a | inspection | stable text; JSON when `--json` |
-| `findo help` | n/a | n/a | inspection | human output |
+| `tanso <query>` | default query source IDs | mixed | `web_search`, `answer` | retrieval envelope, `query.mode=mixed` |
+| `tanso all <query>` | all enabled query source IDs | mixed | `web_search`, `answer` | retrieval envelope, `query.mode=mixed` |
+| `tanso bocha <query>` | `bocha_web` | `bocha` | `web_search` | stable envelope |
+| `tanso volc <query>` | `volcengine_answer` | `volcengine` | `answer` | stable envelope |
+| `tanso volc answer <query>` | `volcengine_answer` | `volcengine` | `answer` | stable envelope |
+| `tanso zhihu <query>` | `zhihu_search` | `zhihu` | `web_search` | stable envelope |
+| `tanso zhihu web <query>` | `zhihu_web` | `zhihu` | `web_search` | stable envelope |
+| `tanso zhihu hot` | `zhihu_hot` | `zhihu` | `hotlist` | stable envelope |
+| `tanso sources` | n/a | mixed | inspection | stable envelope with source status |
+| `tanso config` | n/a | mixed | inspection | redacted human output; JSON when `--json` |
+| `tanso init` | n/a | mixed | config creation | human output |
+| `tanso version` | n/a | n/a | inspection | stable text; JSON when `--json` |
+| `tanso help` | n/a | n/a | inspection | human output |
 
-Deferred commands are not part of the v1.0.0 public contract until their source specs are complete: `findo bocha image <query>` and `findo zhihu answer <query>`.
+Deferred commands are not part of the v1.0.0 public contract until their source specs are complete: `tanso bocha image <query>` and `tanso zhihu answer <query>`.
 
 ## Output Rules
 
@@ -88,18 +88,18 @@ Flag behavior:
 Source-specific flags:
 
 ```bash
---filter string                  # only valid for findo zhihu web
---search-db all|realtime|static  # only valid for findo zhihu web
+--filter string                  # only valid for tanso zhihu web
+--search-db all|realtime|static  # only valid for tanso zhihu web
 ```
 
 Passing a source-specific flag to an incompatible command returns `INVALID_ARGUMENT` with exit code `2`.
 
 ## Environment Variables
 
-Findo-specific variables:
+Tanso-specific variables:
 
 ```text
-FINDO_CONFIG
+TANSO_CONFIG
 BOCHA_API_KEY
 VOLCENGINE_API_KEY
 VOLCENGINE_MODEL
@@ -114,7 +114,7 @@ Volcengine credential resolution:
 2. `ARK_API_KEY`
 3. config field `volcengine.api_key`
 
-`ARK_API_KEY` is supported because the reference implementation and Volcengine Ark examples use it. `VOLCENGINE_API_KEY` remains the Findo-native name.
+`ARK_API_KEY` is supported because the reference implementation and Volcengine Ark examples use it. `VOLCENGINE_API_KEY` remains the Tanso-native name.
 
 Zhihu credential resolution:
 
@@ -122,7 +122,7 @@ Zhihu credential resolution:
 2. `ZHIHU_API_KEY`
 3. config field `zhihu.access_secret`
 
-`ZHIHU_ACCESS_SECRET` matches Zhihu's `access_secret` terminology. `ZHIHU_API_KEY` is kept as a compatibility alias for earlier Findo docs.
+`ZHIHU_ACCESS_SECRET` matches Zhihu's `access_secret` terminology. `ZHIHU_API_KEY` is kept as a compatibility alias for earlier Tanso docs.
 
 ## Config Resolution
 
@@ -136,9 +136,9 @@ Value precedence:
 Config file discovery:
 
 1. Explicit path from `--config`
-2. `FINDO_CONFIG`
-3. `$XDG_CONFIG_HOME/findo/config.yaml`
-4. `~/.config/findo/config.yaml`
+2. `TANSO_CONFIG`
+3. `$XDG_CONFIG_HOME/tanso/config.yaml`
+4. `~/.config/tanso/config.yaml`
 
 If an explicit config path is provided and cannot be loaded, the command fails. If default paths do not exist, built-in defaults are used.
 
@@ -148,11 +148,11 @@ If an explicit config path is provided and cannot be loaded, the command fails. 
 
 | Provider family | Source ID | Capability | Command |
 | --- | --- | --- | --- |
-| `bocha` | `bocha_web` | `web_search` | `findo bocha <query>` |
-| `volcengine` | `volcengine_answer` | `answer` | `findo volc <query>` |
-| `zhihu` | `zhihu_search` | `web_search` | `findo zhihu <query>` |
-| `zhihu` | `zhihu_web` | `web_search` | `findo zhihu web <query>` |
-| `zhihu` | `zhihu_hot` | `hotlist` | `findo hot zhihu` |
+| `bocha` | `bocha_web` | `web_search` | `tanso bocha <query>` |
+| `volcengine` | `volcengine_answer` | `answer` | `tanso volc <query>` |
+| `zhihu` | `zhihu_search` | `web_search` | `tanso zhihu <query>` |
+| `zhihu` | `zhihu_web` | `web_search` | `tanso zhihu web <query>` |
+| `zhihu` | `zhihu_hot` | `hotlist` | `tanso zhihu hot` |
 
 ## Query Modes and Source Selection
 
@@ -165,13 +165,13 @@ Allowed retrieval `query.mode` values:
 
 Selection rules:
 
-- `findo <query>` selects `search.default_source_ids` in config order. The default v1 set is `bocha_web`, `volcengine_answer`, and `zhihu_search`, so its mode is `mixed`.
-- `findo all <query>` selects every enabled source whose capability is `web_search` or `answer`, in source registry order. It never selects `hotlist`.
-- `findo bocha <query>` selects only `bocha_web` and uses `query.mode=search`.
-- `findo volc <query>` and `findo volc answer <query>` select only `volcengine_answer` and use `query.mode=answer`.
-- `findo zhihu <query>` selects only `zhihu_search` and uses `query.mode=search`.
-- `findo zhihu web <query>` selects only `zhihu_web` and uses `query.mode=search`.
-- `findo hot zhihu` selects only `zhihu_hot` and uses `query.mode=hotlist`.
+- `tanso <query>` selects `search.default_source_ids` in config order. The default v1 set is `bocha_web`, `volcengine_answer`, and `zhihu_search`, so its mode is `mixed`.
+- `tanso all <query>` selects every enabled source whose capability is `web_search` or `answer`, in source registry order. It never selects `hotlist`.
+- `tanso bocha <query>` selects only `bocha_web` and uses `query.mode=search`.
+- `tanso volc <query>` and `tanso volc answer <query>` select only `volcengine_answer` and use `query.mode=answer`.
+- `tanso zhihu <query>` selects only `zhihu_search` and uses `query.mode=search`.
+- `tanso zhihu web <query>` selects only `zhihu_web` and uses `query.mode=search`.
+- `tanso zhihu hot` selects only `zhihu_hot` and uses `query.mode=hotlist`.
 
 `--source` accepts source IDs for generic commands. Family aliases may expand deterministically in generic commands: `bocha` -> `bocha_web`, `volcengine` -> `volcengine_answer`, `zhihu` -> `zhihu_search`.
 
@@ -329,7 +329,7 @@ Exit code `1` is reserved for partial success with usable output.
 Automation note: shell scripts that can tolerate degraded output should explicitly accept `0` and `1`, for example:
 
 ```bash
-findo all "AI 搜索" --json > out.json
+tanso all "AI 搜索" --json > out.json
 case $? in
   0|1) jq '.results[]?.url' out.json ;;
   *) exit 1 ;;
@@ -396,7 +396,7 @@ Provider raw types must not enter `search.Envelope`; raw rendering is a CLI/outp
 
 Inspection commands do not use the retrieval envelope.
 
-`findo version --json`:
+`tanso version --json`:
 
 ```json
 {
@@ -404,7 +404,7 @@ Inspection commands do not use the retrieval envelope.
 }
 ```
 
-`findo sources --json`:
+`tanso sources --json`:
 
 ```json
 {
@@ -421,7 +421,7 @@ Inspection commands do not use the retrieval envelope.
 }
 ```
 
-`findo config --json` returns redacted resolved config. Secret values must be either omitted or rendered as `"***"`.
+`tanso config --json` returns redacted resolved config. Secret values must be either omitted or rendered as `"***"`.
 
 ## Compatibility Rules
 

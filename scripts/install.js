@@ -11,7 +11,7 @@ const zlib = require("zlib");
 const pkg = require("../package.json");
 
 const VERSION = pkg.version;
-const REPO = "geekjourneyx/findo";
+const REPO = "geekjourneyx/tanso";
 const PACKAGE_NAME = pkg.name;
 
 const TARGETS = {
@@ -31,9 +31,9 @@ const TARGETS = {
 
 const target = TARGETS[process.platform]?.[process.arch];
 const releaseBaseUrl =
-  process.env.FINDO_RELEASE_BASE_URL ||
+  process.env.TANSO_RELEASE_BASE_URL ||
   `https://github.com/${REPO}/releases/download/v${VERSION}`;
-const binaryName = process.platform === "win32" ? "findo.exe" : "findo";
+const binaryName = process.platform === "win32" ? "tanso.exe" : "tanso";
 const binDir = path.join(__dirname, "..", "bin");
 const destination = path.join(binDir, binaryName);
 
@@ -53,7 +53,7 @@ if (!target) {
   process.exit(1);
 }
 
-const archiveName = `findo_${VERSION}_${target.goos}_${target.goarch}.${target.archive}`;
+const archiveName = `tanso_${VERSION}_${target.goos}_${target.goarch}.${target.archive}`;
 
 function hasScheme(value) {
   return (
@@ -225,7 +225,7 @@ function findBinary(root) {
 }
 
 async function install() {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "findo-npm-"));
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "tanso-npm-"));
   const archivePath = path.join(tmpDir, archiveName);
   const checksumsPath = path.join(tmpDir, "SHA256SUMS");
   const extractDir = path.join(tmpDir, "extract");
@@ -261,7 +261,7 @@ async function install() {
     }
 
     console.log(
-      `Installed findo ${VERSION} from ${resolveAssetLocation(releaseBaseUrl, archiveName)}`
+      `Installed tanso ${VERSION} from ${resolveAssetLocation(releaseBaseUrl, archiveName)}`
     );
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });

@@ -3,7 +3,7 @@ package search
 import (
 	"testing"
 
-	"github.com/geekjourneyx/findo/internal/findoerr"
+	"github.com/geekjourneyx/tanso/internal/tansoerr"
 )
 
 func TestDecideAllOK(t *testing.T) {
@@ -18,8 +18,8 @@ func TestDecideAllOK(t *testing.T) {
 }
 
 func TestDecidePartialUsesFirstFailureCode(t *testing.T) {
-	timeoutErr := findoerr.Error{Code: findoerr.SourceTimeout, Message: "timeout", Retryable: true}
-	rateLimitErr := findoerr.Error{Code: findoerr.SourceRateLimited, Message: "rate limited", Retryable: true}
+	timeoutErr := tansoerr.Error{Code: tansoerr.SourceTimeout, Message: "timeout", Retryable: true}
+	rateLimitErr := tansoerr.Error{Code: tansoerr.SourceRateLimited, Message: "rate limited", Retryable: true}
 
 	status, code, exit := Decide([]SourceStatus{
 		{Status: SourceStatusOK, Results: 1},
@@ -27,21 +27,21 @@ func TestDecidePartialUsesFirstFailureCode(t *testing.T) {
 		{Status: SourceStatusRateLimited, Error: &rateLimitErr},
 	})
 
-	if status != StatusPartial || code != findoerr.SourceTimeout || exit != 1 {
+	if status != StatusPartial || code != tansoerr.SourceTimeout || exit != 1 {
 		t.Fatalf("got %s %q %d", status, code, exit)
 	}
 }
 
 func TestDecideAllTimeoutOrErrorUsesFirstFailureExitCode(t *testing.T) {
-	timeoutErr := findoerr.Error{Code: findoerr.SourceTimeout, Message: "timeout", Retryable: true}
-	badResponseErr := findoerr.Error{Code: findoerr.SourceBadResponse, Message: "bad response", Retryable: true}
+	timeoutErr := tansoerr.Error{Code: tansoerr.SourceTimeout, Message: "timeout", Retryable: true}
+	badResponseErr := tansoerr.Error{Code: tansoerr.SourceBadResponse, Message: "bad response", Retryable: true}
 
 	status, code, exit := Decide([]SourceStatus{
 		{Status: SourceStatusTimeout, Error: &timeoutErr},
 		{Status: SourceStatusError, Error: &badResponseErr},
 	})
 
-	if status != StatusError || code != findoerr.SourceTimeout || exit != findoerr.ExitCodeForCode(findoerr.SourceTimeout) {
+	if status != StatusError || code != tansoerr.SourceTimeout || exit != tansoerr.ExitCodeForCode(tansoerr.SourceTimeout) {
 		t.Fatalf("got %s %q %d", status, code, exit)
 	}
 }
@@ -58,7 +58,7 @@ func TestDecideEmptyOrNoErrorFallback(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			status, code, exit := Decide(tt.statuses)
-			if status != StatusError || code != findoerr.NoResults || exit != findoerr.ExitCodeForCode(findoerr.NoResults) {
+			if status != StatusError || code != tansoerr.NoResults || exit != tansoerr.ExitCodeForCode(tansoerr.NoResults) {
 				t.Fatalf("got %s %q %d", status, code, exit)
 			}
 		})

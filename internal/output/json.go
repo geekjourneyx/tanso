@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/geekjourneyx/findo/internal/findoerr"
-	"github.com/geekjourneyx/findo/internal/search"
+	"github.com/geekjourneyx/tanso/internal/search"
+	"github.com/geekjourneyx/tanso/internal/tansoerr"
 )
 
 func WriteJSON(w io.Writer, value any) error {
@@ -38,7 +38,7 @@ func normalizeEnvelope(env search.Envelope) search.Envelope {
 		env.SourceStatus = []search.SourceStatus{}
 	}
 	if env.Errors == nil {
-		env.Errors = []findoerr.Error{}
+		env.Errors = []tansoerr.Error{}
 	}
 	return env
 }

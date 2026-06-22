@@ -1,11 +1,18 @@
 # Changelog
 
+## v2.0.0
+
+- Rename the project, Go module, npm package, CLI command, release artifacts, and Agent skill to Tanso.
+- Update documentation and visuals around the Tanso positioning: exploring Chinese internet signals through an AI Search CLI.
+- Add `tanso zhihu hot` as the primary Zhihu hotlist command while keeping the old command order compatible.
+- Rename the internal error package to `tansoerr` and update release, npm, and skill packaging paths.
+
 ## v1.2.3
 
-- Keep `skills/findo` as pure Agent Skill content and remove Go code from `skills/`.
+- Keep `skills/tanso` as pure Agent Skill content and remove Go code from `skills/`.
 - Load bundled skill content through `internal/skillcontent` using the repository or npm package `skills/` directory.
-- Ship `skills/findo` in npm packages and GitHub Release archives, and smoke-test `findo skills read` from npm installs.
-- Simplify `skills/findo/SKILL.md` into a concise English Agent SOP.
+- Ship `skills/tanso` in npm packages and GitHub Release archives, and smoke-test `tanso skills read` from npm installs.
+- Simplify `skills/tanso/SKILL.md` into a concise English Agent SOP.
 
 ## v1.2.2
 
@@ -20,8 +27,8 @@
 
 ## v1.2.0
 
-- Embed the Findo Agent skill in the release binary.
-- Add `findo skills list/read` so agents can discover and read the current-version SOP without relying on stale external docs.
+- Embed the Tanso Agent skill in the release binary.
+- Add `tanso skills list/read` so agents can discover and read the current-version SOP without relying on stale external docs.
 - Extend release checks to guard embedded skill documentation and version consistency.
 
 ## v1.1.0

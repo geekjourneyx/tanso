@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/geekjourneyx/findo/internal/findoerr"
-	"github.com/geekjourneyx/findo/internal/search"
+	"github.com/geekjourneyx/tanso/internal/search"
+	"github.com/geekjourneyx/tanso/internal/tansoerr"
 )
 
 func TestClientAnswerSendsWebSearchRequestAndMapsCitations(t *testing.T) {
@@ -148,7 +148,7 @@ func TestClientAnswerMissingAPIKey(t *testing.T) {
 	client := Client{Endpoint: "https://example.invalid", Model: "model"}
 
 	_, err := client.Answer(context.Background(), search.AnswerQuery{Text: "hello", Limit: 1})
-	assertFindoError(t, err, findoerr.CredentialMissing, 0, false)
+	assertTansoError(t, err, tansoerr.CredentialMissing, 0, false)
 }
 
 func TestClientAnswerRequiresWebSearchCall(t *testing.T) {
@@ -159,7 +159,7 @@ func TestClientAnswerRequiresWebSearchCall(t *testing.T) {
 
 	client := Client{Endpoint: server.URL, APIKey: "test-key", Model: "model"}
 	_, err := client.Answer(context.Background(), search.AnswerQuery{Text: "hello", Limit: 1})
-	assertFindoError(t, err, findoerr.NoRetrievalTriggered, 0, false)
+	assertTansoError(t, err, tansoerr.NoRetrievalTriggered, 0, false)
 }
 
 func TestClientAnswerMapsProviderErrors(t *testing.T) {
@@ -169,9 +169,9 @@ func TestClientAnswerMapsProviderErrors(t *testing.T) {
 		wantCode   string
 		retryable  bool
 	}{
-		{name: "401", statusCode: http.StatusUnauthorized, wantCode: findoerr.SourceUnauthorized},
-		{name: "429", statusCode: http.StatusTooManyRequests, wantCode: findoerr.SourceRateLimited, retryable: true},
-		{name: "5xx", statusCode: http.StatusBadGateway, wantCode: findoerr.SourceUnavailable, retryable: true},
+		{name: "401", statusCode: http.StatusUnauthorized, wantCode: tansoerr.SourceUnauthorized},
+		{name: "429", statusCode: http.StatusTooManyRequests, wantCode: tansoerr.SourceRateLimited, retryable: true},
+		{name: "5xx", statusCode: http.StatusBadGateway, wantCode: tansoerr.SourceUnavailable, retryable: true},
 	}
 
 	for _, tt := range tests {
@@ -183,7 +183,7 @@ func TestClientAnswerMapsProviderErrors(t *testing.T) {
 
 			client := Client{Endpoint: server.URL, APIKey: "test-key", Model: "model"}
 			_, err := client.Answer(context.Background(), search.AnswerQuery{Text: "hello", Limit: 1})
-			assertFindoError(t, err, tt.wantCode, tt.statusCode, tt.retryable)
+			assertTansoError(t, err, tt.wantCode, tt.statusCode, tt.retryable)
 		})
 	}
 }
@@ -196,7 +196,7 @@ func TestClientAnswerInvalidJSON(t *testing.T) {
 
 	client := Client{Endpoint: server.URL, APIKey: "test-key", Model: "model"}
 	_, err := client.Answer(context.Background(), search.AnswerQuery{Text: "hello", Limit: 1})
-	assertFindoError(t, err, findoerr.SourceBadResponse, 0, false)
+	assertTansoError(t, err, tansoerr.SourceBadResponse, 0, false)
 }
 
 func TestClientAnswerContextDeadlineMapsToTimeout(t *testing.T) {
@@ -210,7 +210,7 @@ func TestClientAnswerContextDeadlineMapsToTimeout(t *testing.T) {
 	}
 
 	_, err := client.Answer(context.Background(), search.AnswerQuery{Text: "hello", Limit: 1})
-	assertFindoError(t, err, findoerr.SourceTimeout, 0, true)
+	assertTansoError(t, err, tansoerr.SourceTimeout, 0, true)
 }
 
 func TestClientImplementsInterfaces(t *testing.T) {
@@ -218,11 +218,11 @@ func TestClientImplementsInterfaces(t *testing.T) {
 	var _ search.Answerer = Client{}
 }
 
-func assertFindoError(t *testing.T, err error, wantCode string, wantProviderStatus int, wantRetryable bool) {
+func assertTansoError(t *testing.T, err error, wantCode string, wantProviderStatus int, wantRetryable bool) {
 	t.Helper()
-	var ferr findoerr.Error
+	var ferr tansoerr.Error
 	if !errors.As(err, &ferr) {
-		t.Fatalf("error = %T %v, want findoerr.Error", err, err)
+		t.Fatalf("error = %T %v, want tansoerr.Error", err, err)
 	}
 	if ferr.Code != wantCode {
 		t.Fatalf("code = %q, want %q", ferr.Code, wantCode)

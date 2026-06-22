@@ -1,25 +1,25 @@
 <div align="center">
 
-# Findo
+# Tanso
 
-**Search Chinese web sources from one Go CLI.**
+**探索中文互联网的 AI Search CLI.**
 
-<img src="assets/banner.webp" alt="Findo - Chinese web sources from one Go CLI" width="100%">
+<img src="assets/banner.webp" alt="Tanso - 探索中文互联网的 AI Search CLI" width="100%">
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Go](https://img.shields.io/badge/Go-1.23+-00ADD8.svg)](./go.mod)
 
 </div>
 
-Findo queries Bocha, Volcengine Ark, and Zhihu through provider APIs, then returns normalized terminal output or automation-safe JSON. It is built for developers, AI agents, and research workflows that need Chinese internet retrieval without scraping, browser sessions, or hidden side effects.
+Tanso queries Bocha, Volcengine Ark, and Zhihu through provider APIs, then returns normalized terminal output or automation-safe JSON. The name comes from the feel of "探索 / 探索する": Tanso explores Chinese internet signals for developers, AI agents, and research workflows without scraping, browser sessions, or hidden side effects.
 
 ## Install
 
 Recommended:
 
 ```bash
-npm install -g @geekjourneyx/findo
-findo version
+npm install -g @geekjourneyx/tanso
+tanso version
 ```
 
 The npm package installs the matching GitHub Release binary for your platform and verifies it against `SHA256SUMS`.
@@ -27,16 +27,16 @@ The npm package installs the matching GitHub Release binary for your platform an
 Alternative Go install:
 
 ```bash
-go install github.com/geekjourneyx/findo/cmd/findo@v1.2.3
+go install github.com/geekjourneyx/tanso/cmd/tanso@v2.0.0
 ```
 
-Prebuilt binaries and checksums are available on the [GitHub Releases](https://github.com/geekjourneyx/findo/releases) page.
+Prebuilt binaries and checksums are available on the [GitHub Releases](https://github.com/geekjourneyx/tanso/releases) page.
 
 From a local checkout:
 
 ```bash
 make build
-./findo version
+./tanso version
 ```
 
 ## Configure
@@ -44,17 +44,17 @@ make build
 Initialize the default config file:
 
 ```bash
-findo config init
-findo config path
+tanso config init
+tanso config path
 ```
 
 This creates a config file at the platform default path. On Linux this is typically:
 
 ```text
-~/.config/findo/config.yaml
+~/.config/tanso/config.yaml
 ```
 
-Run `findo config path` for the exact path on your machine.
+Run `tanso config path` for the exact path on your machine.
 
 Edit that file and set the credentials for the providers you want to use:
 
@@ -82,13 +82,13 @@ Configuration precedence is:
 
 1. CLI flags
 2. Environment variables
-3. `--config` file or `~/.config/findo/config.yaml`
+3. `--config` file or `~/.config/tanso/config.yaml`
 4. Built-in defaults
 
 Inspect the merged config without leaking secrets:
 
 ```bash
-findo config show --json
+tanso config show --json
 ```
 
 Before publishing a release, verify version alignment across `package.json`, `Makefile`, `CHANGELOG.md`, and the release tag:
@@ -101,16 +101,18 @@ make release-check
 ## Quick Start
 
 ```bash
-findo version
-findo sources --json
-findo skills list --json
-findo skills read findo --json
+tanso version
+tanso sources --json
+tanso skills list --json
+tanso skills read tanso --json
 
-BOCHA_API_KEY=... findo bocha "AI Agent 商业化" --json
-ARK_API_KEY=... findo volc "瑞幸咖啡 2026 门店数是否可信" --json
-ZHIHU_ACCESS_SECRET=... findo zhihu "AI 搜索" --json
-ZHIHU_ACCESS_SECRET=... findo zhihu web "ChatGPT 桌面版" --json
-ZHIHU_ACCESS_SECRET=... findo hot zhihu --json
+tanso "AI Agent 商业化" --json
+BOCHA_API_KEY=... tanso bocha "AI Agent 商业化" --json
+BOCHA_API_KEY=... tanso bocha "微信 AI Agent" --json
+ARK_API_KEY=... tanso volc "瑞幸咖啡 2026 门店数是否可信" --json
+ZHIHU_ACCESS_SECRET=... tanso zhihu "AI 搜索" --json
+ZHIHU_ACCESS_SECRET=... tanso zhihu web "ChatGPT 桌面版" --json
+ZHIHU_ACCESS_SECRET=... tanso zhihu hot --json
 ```
 
 Human output defaults to a table. Use `--json` for scripts, agents, CI, and downstream tools.
@@ -120,15 +122,15 @@ Human output defaults to a table. Use `--json` for scripts, agents, CI, and down
 Recommended Agent Skills install:
 
 ```bash
-npx skills add geekjourneyx/findo
+npx skills add geekjourneyx/tanso
 ```
 
-Findo also ships the same Agent SOP with the CLI package so agents can read instructions that match the executable on `PATH`:
+Tanso also ships the same Agent SOP with the CLI package so agents can read instructions that match the executable on `PATH`:
 
 ```bash
-findo skills list --json
-findo skills read findo
-findo skills read findo --json
+tanso skills list --json
+tanso skills read tanso
+tanso skills read tanso --json
 ```
 
 `skills read` defaults to raw Markdown for direct agent context. With `--json`, the same content is returned in the `content` field with version metadata. Use this when you need to verify the SOP bundled with the installed CLI.
@@ -139,7 +141,7 @@ Retrieval commands return a stable envelope. A successful JSON response looks li
 
 ```json
 {
-  "version": "1.2.3",
+  "version": "2.0.0",
   "query": {
     "text": "AI Agent 商业化",
     "mode": "search",
@@ -187,26 +189,26 @@ Exit codes are part of the public contract:
 
 | Source ID | Command | Provider | Capability |
 | --- | --- | --- | --- |
-| `bocha_web` | `findo bocha` | Bocha | Web search |
-| `volcengine_answer` | `findo volc` | Volcengine Ark | Web-grounded answer |
-| `zhihu_search` | `findo zhihu` | Zhihu | In-site search |
-| `zhihu_web` | `findo zhihu web` | Zhihu | Global web search |
-| `zhihu_hot` | `findo hot zhihu` | Zhihu | Hotlist |
+| `bocha_web` | `tanso bocha` | Bocha | Web search |
+| `volcengine_answer` | `tanso volc` | Volcengine Ark | Web-grounded answer |
+| `zhihu_search` | `tanso zhihu` | Zhihu | In-site search |
+| `zhihu_web` | `tanso zhihu web` | Zhihu | Global web search |
+| `zhihu_hot` | `tanso zhihu hot` | Zhihu | Hotlist |
 
 Zhihu global search supports provider-specific filters:
 
 ```bash
-findo zhihu web "ChatGPT 桌面版" \
+tanso zhihu web "ChatGPT 桌面版" \
   --filter 'host=="example.com"' \
   --search-db realtime \
   --json
 ```
 
-`--filter` and `--search-db` are only valid for `findo zhihu web`.
+`--filter` and `--search-db` are only valid for `tanso zhihu web`.
 
 ## Automation Contract
 
-Findo keeps the automation contract narrow and predictable:
+Tanso keeps the automation contract narrow and predictable:
 
 - stdout is reserved for results.
 - stderr is reserved for diagnostics.
@@ -233,7 +235,7 @@ make smoke-zhihu
 
 ## Non-Goals
 
-Findo v1.0.0 intentionally does not implement browser scraping, cache, reranking, plugin runtime, MCP, stdin query input, Bocha image search, or Zhihu direct answer. Those boundaries keep the CLI small, testable, and stable.
+Tanso v1.0.0 intentionally does not implement browser scraping, cache, reranking, plugin runtime, MCP, stdin query input, Bocha image search, or Zhihu direct answer. Those boundaries keep the CLI small, testable, and stable.
 
 ## License
 

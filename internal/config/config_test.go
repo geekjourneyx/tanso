@@ -27,7 +27,7 @@ func TestDefaultPathUsesUserConfigDir(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := filepath.Join(dir, "findo", "config.yaml")
+	want := filepath.Join(dir, "tanso", "config.yaml")
 	if path != want {
 		t.Fatalf("path = %q, want %q", path, want)
 	}
@@ -36,7 +36,7 @@ func TestDefaultPathUsesUserConfigDir(t *testing.T) {
 func TestLoadReadsDefaultPathWhenPresent(t *testing.T) {
 	dir := t.TempDir()
 	t.Setenv("XDG_CONFIG_HOME", dir)
-	path := filepath.Join(dir, "findo", "config.yaml")
+	path := filepath.Join(dir, "tanso", "config.yaml")
 	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
 		t.Fatal(err)
 	}
@@ -67,7 +67,7 @@ func TestLoadIgnoresMissingDefaultPath(t *testing.T) {
 }
 
 func TestInitWritesDefaultConfig(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "findo", "config.yaml")
+	path := filepath.Join(t.TempDir(), "tanso", "config.yaml")
 
 	written, err := Init(path, false)
 	if err != nil {

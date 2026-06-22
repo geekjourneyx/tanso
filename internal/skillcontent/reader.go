@@ -83,7 +83,7 @@ func (r *Reader) Read(name, relpath string) (ReadResult, error) {
 		Content: string(data),
 	}
 	if cleaned == "SKILL.md" {
-		result.Guidance = fmt.Sprintf("Read this skill from the installed findo package with `findo skills read %s --json` so the SOP stays in sync with this CLI version.", name)
+		result.Guidance = fmt.Sprintf("Read this skill from the installed tanso package with `tanso skills read %s --json` so the SOP stays in sync with this CLI version.", name)
 	}
 	return result, nil
 }
@@ -145,7 +145,7 @@ func parseDescription(skillMD []byte) string {
 }
 
 func unknownSkill(name string) error {
-	return fmt.Errorf("unknown skill %q; run 'findo skills list --json' to see available skills", name)
+	return fmt.Errorf("unknown skill %q; run 'tanso skills list --json' to see available skills", name)
 }
 
 func cleanSubPath(relpath string) (string, error) {

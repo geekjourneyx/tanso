@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/geekjourneyx/findo/internal/findoerr"
-	"github.com/geekjourneyx/findo/internal/search"
+	"github.com/geekjourneyx/tanso/internal/search"
+	"github.com/geekjourneyx/tanso/internal/tansoerr"
 )
 
 var (
@@ -150,7 +150,7 @@ func TestInvalidSearchDBReturnsInvalidArgumentWithoutRequest(t *testing.T) {
 
 	client := Client{EndpointBase: server.URL, AccessSecret: "secret", HTTPClient: server.Client()}
 	_, err := client.GlobalSearch(context.Background(), search.SearchQuery{Text: "query", SearchDB: "archive"})
-	assertFindoError(t, err, findoerr.InvalidArgument, search.SourceZhihuWeb, false, 0, "")
+	assertTansoError(t, err, tansoerr.InvalidArgument, search.SourceZhihuWeb, false, 0, "")
 	if requests != 0 {
 		t.Fatalf("requests = %d", requests)
 	}
@@ -165,7 +165,7 @@ func TestEmptyQueryReturnsInvalidArgumentWithoutRequest(t *testing.T) {
 
 	client := Client{EndpointBase: server.URL, AccessSecret: "secret", HTTPClient: server.Client()}
 	_, err := client.Search(context.Background(), search.SearchQuery{Text: "   ", Limit: 5})
-	assertFindoError(t, err, findoerr.InvalidArgument, search.SourceZhihuSearch, false, 0, "")
+	assertTansoError(t, err, tansoerr.InvalidArgument, search.SourceZhihuSearch, false, 0, "")
 	if requests != 0 {
 		t.Fatalf("requests = %d", requests)
 	}
@@ -174,7 +174,7 @@ func TestEmptyQueryReturnsInvalidArgumentWithoutRequest(t *testing.T) {
 func TestMissingAccessSecretReturnsCredentialMissingWithSource(t *testing.T) {
 	client := Client{EndpointBase: "https://example.invalid"}
 	_, err := client.Hotlist(context.Background(), search.HotlistQuery{Limit: 5})
-	assertFindoError(t, err, findoerr.CredentialMissing, search.SourceZhihuHot, false, 0, "")
+	assertTansoError(t, err, tansoerr.CredentialMissing, search.SourceZhihuHot, false, 0, "")
 }
 
 func TestProviderAuthAndRateLimitMapping(t *testing.T) {
@@ -189,7 +189,7 @@ func TestProviderAuthAndRateLimitMapping(t *testing.T) {
 		{
 			name:       "auth",
 			body:       `{"Code":20001,"Message":"auth failed"}`,
-			wantCode:   findoerr.SourceUnauthorized,
+			wantCode:   tansoerr.SourceUnauthorized,
 			wantSource: search.SourceZhihuSearch,
 			retryable:  false,
 			provider:   "20001",
@@ -197,7 +197,7 @@ func TestProviderAuthAndRateLimitMapping(t *testing.T) {
 		{
 			name:       "rate limit",
 			body:       `{"Code":30001,"Message":"rate limited"}`,
-			wantCode:   findoerr.SourceRateLimited,
+			wantCode:   tansoerr.SourceRateLimited,
 			wantSource: search.SourceZhihuWeb,
 			retryable:  true,
 			provider:   "30001",
@@ -217,7 +217,7 @@ func TestProviderAuthAndRateLimitMapping(t *testing.T) {
 			} else {
 				_, err = client.GlobalSearch(context.Background(), search.SearchQuery{Text: "query", Limit: 5})
 			}
-			assertFindoError(t, err, tt.wantCode, tt.wantSource, tt.retryable, http.StatusOK, tt.provider)
+			assertTansoError(t, err, tt.wantCode, tt.wantSource, tt.retryable, http.StatusOK, tt.provider)
 		})
 	}
 }
@@ -230,12 +230,12 @@ func TestHTTPAndDecodeErrorMapping(t *testing.T) {
 		wantCode  string
 		retryable bool
 	}{
-		{name: "bad request", status: http.StatusBadRequest, wantCode: findoerr.InvalidArgument, retryable: false},
-		{name: "unauthorized", status: http.StatusUnauthorized, wantCode: findoerr.SourceUnauthorized, retryable: false},
-		{name: "forbidden", status: http.StatusForbidden, wantCode: findoerr.SourceUnauthorized, retryable: false},
-		{name: "rate limited", status: http.StatusTooManyRequests, wantCode: findoerr.SourceRateLimited, retryable: true},
-		{name: "server error", status: http.StatusInternalServerError, wantCode: findoerr.SourceUnavailable, retryable: true},
-		{name: "invalid json", status: http.StatusOK, body: `{`, wantCode: findoerr.SourceBadResponse, retryable: false},
+		{name: "bad request", status: http.StatusBadRequest, wantCode: tansoerr.InvalidArgument, retryable: false},
+		{name: "unauthorized", status: http.StatusUnauthorized, wantCode: tansoerr.SourceUnauthorized, retryable: false},
+		{name: "forbidden", status: http.StatusForbidden, wantCode: tansoerr.SourceUnauthorized, retryable: false},
+		{name: "rate limited", status: http.StatusTooManyRequests, wantCode: tansoerr.SourceRateLimited, retryable: true},
+		{name: "server error", status: http.StatusInternalServerError, wantCode: tansoerr.SourceUnavailable, retryable: true},
+		{name: "invalid json", status: http.StatusOK, body: `{`, wantCode: tansoerr.SourceBadResponse, retryable: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -252,7 +252,7 @@ func TestHTTPAndDecodeErrorMapping(t *testing.T) {
 				})},
 			}
 			_, err := client.Search(context.Background(), search.SearchQuery{Text: "query", Limit: 5})
-			assertFindoError(t, err, tt.wantCode, search.SourceZhihuSearch, tt.retryable, tt.status, "")
+			assertTansoError(t, err, tt.wantCode, search.SourceZhihuSearch, tt.retryable, tt.status, "")
 		})
 	}
 }
@@ -275,17 +275,17 @@ func TestTimeoutErrorMapping(t *testing.T) {
 				})},
 			}
 			_, err := client.GlobalSearch(context.Background(), search.SearchQuery{Text: "query", Limit: 5})
-			assertFindoError(t, err, findoerr.SourceTimeout, search.SourceZhihuWeb, true, 0, "")
+			assertTansoError(t, err, tansoerr.SourceTimeout, search.SourceZhihuWeb, true, 0, "")
 		})
 	}
 }
 
-func assertFindoError(t *testing.T, err error, code string, source search.SourceID, retryable bool, providerStatus int, providerCode string) {
+func assertTansoError(t *testing.T, err error, code string, source search.SourceID, retryable bool, providerStatus int, providerCode string) {
 	t.Helper()
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	got, ok := err.(findoerr.Error)
+	got, ok := err.(tansoerr.Error)
 	if !ok {
 		t.Fatalf("error type = %T", err)
 	}

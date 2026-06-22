@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/geekjourneyx/findo/internal/search"
+	"github.com/geekjourneyx/tanso/internal/search"
 )
 
 func WriteMarkdown(w io.Writer, env search.Envelope) error {

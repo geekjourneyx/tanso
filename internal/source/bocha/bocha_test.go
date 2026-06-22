@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/geekjourneyx/findo/internal/findoerr"
-	"github.com/geekjourneyx/findo/internal/search"
+	"github.com/geekjourneyx/tanso/internal/search"
+	"github.com/geekjourneyx/tanso/internal/tansoerr"
 )
 
 func TestClientImplementsInterfaces(t *testing.T) {
@@ -47,7 +47,7 @@ func TestSearchSuccessMappingAndRequest(t *testing.T) {
 	defer server.Close()
 
 	client := New("secret", server.URL)
-	results, err := client.Search(context.Background(), search.SearchQuery{Text: "findo"})
+	results, err := client.Search(context.Background(), search.SearchQuery{Text: "tanso"})
 	if err != nil {
 		t.Fatalf("Search returned error: %v", err)
 	}
@@ -61,7 +61,7 @@ func TestSearchSuccessMappingAndRequest(t *testing.T) {
 	if gotRequest.ContentType != "application/json" {
 		t.Fatalf("content-type = %q", gotRequest.ContentType)
 	}
-	if gotRequest.Body["query"] != "findo" {
+	if gotRequest.Body["query"] != "tanso" {
 		t.Fatalf("query body = %#v", gotRequest.Body["query"])
 	}
 	if gotRequest.Body["summary"] != true {
@@ -94,8 +94,8 @@ func TestSearchSuccessMappingAndRequest(t *testing.T) {
 
 func TestSearchMissingAPIKey(t *testing.T) {
 	client := New("", "http://example.invalid")
-	_, err := client.Search(context.Background(), search.SearchQuery{Text: "findo"})
-	assertFindoError(t, err, findoerr.CredentialMissing)
+	_, err := client.Search(context.Background(), search.SearchQuery{Text: "tanso"})
+	assertTansoError(t, err, tansoerr.CredentialMissing)
 }
 
 func TestSearchLimitTruncatesLocally(t *testing.T) {
@@ -116,7 +116,7 @@ func TestSearchLimitTruncatesLocally(t *testing.T) {
 	defer server.Close()
 
 	client := New("secret", server.URL)
-	results, err := client.Search(context.Background(), search.SearchQuery{Text: "findo", Limit: 2})
+	results, err := client.Search(context.Background(), search.SearchQuery{Text: "tanso", Limit: 2})
 	if err != nil {
 		t.Fatalf("Search returned error: %v", err)
 	}
@@ -134,10 +134,10 @@ func TestSearchHTTPStatusErrors(t *testing.T) {
 		code int
 		want string
 	}{
-		{name: "bad request", code: http.StatusBadRequest, want: findoerr.InvalidArgument},
-		{name: "unauthorized", code: http.StatusUnauthorized, want: findoerr.SourceUnauthorized},
-		{name: "rate limited", code: http.StatusTooManyRequests, want: findoerr.SourceRateLimited},
-		{name: "server error", code: http.StatusInternalServerError, want: findoerr.SourceUnavailable},
+		{name: "bad request", code: http.StatusBadRequest, want: tansoerr.InvalidArgument},
+		{name: "unauthorized", code: http.StatusUnauthorized, want: tansoerr.SourceUnauthorized},
+		{name: "rate limited", code: http.StatusTooManyRequests, want: tansoerr.SourceRateLimited},
+		{name: "server error", code: http.StatusInternalServerError, want: tansoerr.SourceUnavailable},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -147,8 +147,8 @@ func TestSearchHTTPStatusErrors(t *testing.T) {
 			defer server.Close()
 
 			client := New("secret", server.URL)
-			_, err := client.Search(context.Background(), search.SearchQuery{Text: "findo"})
-			assertFindoError(t, err, tt.want)
+			_, err := client.Search(context.Background(), search.SearchQuery{Text: "tanso"})
+			assertTansoError(t, err, tt.want)
 		})
 	}
 }
@@ -160,8 +160,8 @@ func TestSearchInvalidJSON(t *testing.T) {
 	defer server.Close()
 
 	client := New("secret", server.URL)
-	_, err := client.Search(context.Background(), search.SearchQuery{Text: "findo"})
-	assertFindoError(t, err, findoerr.SourceBadResponse)
+	_, err := client.Search(context.Background(), search.SearchQuery{Text: "tanso"})
+	assertTansoError(t, err, tansoerr.SourceBadResponse)
 }
 
 func TestSearchProviderNonSuccessCode(t *testing.T) {
@@ -170,8 +170,8 @@ func TestSearchProviderNonSuccessCode(t *testing.T) {
 		body string
 		want string
 	}{
-		{name: "provider bad request", body: `{"code":400,"msg":"bad query"}`, want: findoerr.InvalidArgument},
-		{name: "provider token", body: `{"code":401,"msg":"invalid token"}`, want: findoerr.CredentialMissing},
+		{name: "provider bad request", body: `{"code":400,"msg":"bad query"}`, want: tansoerr.InvalidArgument},
+		{name: "provider token", body: `{"code":401,"msg":"invalid token"}`, want: tansoerr.CredentialMissing},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -181,20 +181,20 @@ func TestSearchProviderNonSuccessCode(t *testing.T) {
 			defer server.Close()
 
 			client := New("secret", server.URL)
-			_, err := client.Search(context.Background(), search.SearchQuery{Text: "findo"})
-			assertFindoError(t, err, tt.want)
+			_, err := client.Search(context.Background(), search.SearchQuery{Text: "tanso"})
+			assertTansoError(t, err, tt.want)
 		})
 	}
 }
 
-func assertFindoError(t *testing.T, err error, wantCode string) {
+func assertTansoError(t *testing.T, err error, wantCode string) {
 	t.Helper()
 	if err == nil {
 		t.Fatalf("expected error")
 	}
-	var ferr findoerr.Error
+	var ferr tansoerr.Error
 	if !errors.As(err, &ferr) {
-		t.Fatalf("error = %T %[1]v, want findoerr.Error", err)
+		t.Fatalf("error = %T %[1]v, want tansoerr.Error", err)
 	}
 	if ferr.Code != wantCode {
 		t.Fatalf("code = %q, want %q; error = %#v", ferr.Code, wantCode, ferr)

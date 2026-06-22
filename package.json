@@ -1,18 +1,18 @@
 {
-  "name": "@geekjourneyx/findo",
-  "version": "1.2.3",
-  "description": "Install the findo CLI from the matching GitHub Release bundle.",
+  "name": "@geekjourneyx/tanso",
+  "version": "2.0.0",
+  "description": "Install Tanso, an AI Search CLI for exploring Chinese internet signals.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/geekjourneyx/findo.git"
+    "url": "git+https://github.com/geekjourneyx/tanso.git"
   },
-  "homepage": "https://github.com/geekjourneyx/findo#readme",
+  "homepage": "https://github.com/geekjourneyx/tanso#readme",
   "bugs": {
-    "url": "https://github.com/geekjourneyx/findo/issues"
+    "url": "https://github.com/geekjourneyx/tanso/issues"
   },
   "bin": {
-    "findo": "scripts/run.js"
+    "tanso": "scripts/run.js"
   },
   "scripts": {
     "pack:check": "npm pack --json --dry-run",
@@ -21,8 +21,8 @@
   "files": [
     "scripts/install.js",
     "scripts/run.js",
-    "skills/findo/SKILL.md",
-    "skills/findo/test-prompts.json",
+    "skills/tanso/SKILL.md",
+    "skills/tanso/test-prompts.json",
     "README.md",
     "CHANGELOG.md",
     "LICENSE"

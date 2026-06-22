@@ -2,7 +2,7 @@
 
 ## Goal
 
-Define Findo's Zhihu adapter contract using official Zhihu developer API details supplied for this project.
+Define Tanso's Zhihu adapter contract using official Zhihu developer API details supplied for this project.
 
 This document currently specifies Zhihu in-site content search, global web search, and hotlist. Zhida direct answer will be added when its official request and response fields are available in the same level of detail.
 
@@ -32,7 +32,7 @@ Recognized credential inputs:
 
 Provider response code mapping:
 
-| Zhihu code | Meaning | Findo code | Retryable |
+| Zhihu code | Meaning | Tanso code | Retryable |
 | --- | --- | --- | --- |
 | `0` | success | none | false |
 | `10001` | parameter error | `INVALID_ARGUMENT` | false |
@@ -42,7 +42,7 @@ Provider response code mapping:
 
 HTTP-level mapping:
 
-| HTTP condition | Findo code | Retryable |
+| HTTP condition | Tanso code | Retryable |
 | --- | --- | --- |
 | missing local access secret | `CREDENTIAL_MISSING` | false |
 | HTTP 400 | `INVALID_ARGUMENT` | false |
@@ -61,13 +61,13 @@ HTTP-level mapping:
 CapabilityWebSearch
 ```
 
-Zhihu in-site search is a content search source for questions, answers, and articles inside Zhihu. In Findo output it maps to normal `type=web` results with `source=zhihu_search`.
+Zhihu in-site search is a content search source for questions, answers, and articles inside Zhihu. In Tanso output it maps to normal `type=web` results with `source=zhihu_search`.
 
 ### Command
 
 ```bash
-findo zhihu "RAG 评测方法"
-findo zhihu "RAG 评测方法" --json
+tanso zhihu "RAG 评测方法"
+tanso zhihu "RAG 评测方法" --json
 ```
 
 ### Endpoint
@@ -78,7 +78,7 @@ GET https://developer.zhihu.com/api/v1/content/zhihu_search
 
 ### Query Parameters
 
-| Name | Type | Required | Findo source |
+| Name | Type | Required | Tanso source |
 | --- | --- | --- | --- |
 | `Query` | string | yes | search query text |
 | `Count` | int32 | no | `--limit`, capped to 10 |
@@ -89,8 +89,8 @@ Rules:
 - `Count` defaults to `10`.
 - `Count <= 0` falls back to `10` server-side.
 - `Count > 10` is truncated to `10` server-side.
-- Findo should validate `Query` before sending the request.
-- Findo should clamp `Count` to `1..10` before sending the request, so CLI behavior is explicit.
+- Tanso should validate `Query` before sending the request.
+- Tanso should clamp `Count` to `1..10` before sending the request, so CLI behavior is explicit.
 
 Example:
 
@@ -170,13 +170,13 @@ Provider fields that are useful for `--raw`, diagnostics, or future metadata:
 
 ### Content Type Handling
 
-Official `ContentType` examples include `Article`. Findo should not hard-code only one value.
+Official `ContentType` examples include `Article`. Tanso should not hard-code only one value.
 
-`ContentType` remains provider metadata in the first implementation. The stable Findo `type` remains `web` because all returned items are navigable content results.
+`ContentType` remains provider metadata in the first implementation. The stable Tanso `type` remains `web` because all returned items are navigable content results.
 
 ### Time Handling
 
-`EditTime` is an `Int32` Unix timestamp. Findo should convert it to RFC3339 UTC in `published_at`.
+`EditTime` is an `Int32` Unix timestamp. Tanso should convert it to RFC3339 UTC in `published_at`.
 
 If `EditTime` is `0`, omit `published_at`.
 
@@ -214,8 +214,8 @@ Zhihu global search is a web search source for the broader internet. It can retu
 ### Command
 
 ```bash
-findo zhihu web "ChatGPT 电脑桌面版"
-findo zhihu web "ChatGPT 电脑桌面版" --json
+tanso zhihu web "ChatGPT 电脑桌面版"
+tanso zhihu web "ChatGPT 电脑桌面版" --json
 ```
 
 ### Endpoint
@@ -226,7 +226,7 @@ GET https://developer.zhihu.com/api/v1/content/global_search
 
 ### Query Parameters
 
-| Name | Type | Required | Findo source |
+| Name | Type | Required | Tanso source |
 | --- | --- | --- | --- |
 | `Query` | string | yes | search query text |
 | `Count` | int32 | no | `--limit`, capped to 20 |
@@ -269,7 +269,7 @@ Operators:
 - logical operators `AND` and `OR` must be uppercase.
 - `AND` has higher priority than `OR`.
 - parentheses may be used to control precedence.
-- `host=="zhihu.com"` and Zhihu subdomains are not supported. Use `zhihu_search` through `findo zhihu <query>` for Zhihu-only content.
+- `host=="zhihu.com"` and Zhihu subdomains are not supported. Use `zhihu_search` through `tanso zhihu <query>` for Zhihu-only content.
 
 Examples:
 
@@ -279,9 +279,9 @@ host=="example.com" AND publish_time>=1778494631
 (host=="example.com" OR host=="news.example.com") AND publish_time>1778494631
 ```
 
-### Findo Filter Policy
+### Tanso Filter Policy
 
-For v1.0.0, Findo exposes:
+For v1.0.0, Tanso exposes:
 
 - `--filter <expr>`: raw advanced filter expression, passed through after validating it is non-empty.
 - `--search-db <all|realtime|static>`: explicit index selection.
@@ -351,7 +351,7 @@ Result{
 }
 ```
 
-`ContentText` may contain `<em>` tags for highlighted text. For JSON output, Findo should preserve the text safely as a string. Table and Markdown renderers may strip or convert `<em>` tags to avoid rendering raw HTML unexpectedly.
+`ContentText` may contain `<em>` tags for highlighted text. For JSON output, Tanso should preserve the text safely as a string. Table and Markdown renderers may strip or convert `<em>` tags to avoid rendering raw HTML unexpectedly.
 
 Provider fields that are useful for `--raw`, diagnostics, or future metadata:
 
@@ -371,7 +371,7 @@ Provider fields that are useful for `--raw`, diagnostics, or future metadata:
 
 ### Time Handling
 
-`EditTime` is an `Int64` Unix timestamp. Findo should convert it to RFC3339 UTC in `published_at`.
+`EditTime` is an `Int64` Unix timestamp. Tanso should convert it to RFC3339 UTC in `published_at`.
 
 If `EditTime` is `0`, omit `published_at`.
 
@@ -406,9 +406,9 @@ Zhihu hotlist returns the current structured Zhihu hot topics. The official API 
 ### Command
 
 ```bash
-findo hot zhihu
-findo hot zhihu --json
-findo hot zhihu --limit 10 --markdown
+tanso zhihu hot
+tanso zhihu hot --json
+tanso zhihu hot --limit 10 --markdown
 ```
 
 ### Endpoint
@@ -419,7 +419,7 @@ GET https://developer.zhihu.com/api/v1/content/hot_list
 
 ### Query Parameters
 
-| Name | Type | Required | Findo source |
+| Name | Type | Required | Tanso source |
 | --- | --- | --- | --- |
 | `Limit` | int32 | no | `--limit`, capped to 30 |
 
@@ -428,7 +428,7 @@ Rules:
 - `Limit` defaults to `30`.
 - `Limit` max is `30`.
 - When `Limit <= 0` or `Limit > 30`, the server falls back to `30`.
-- Findo should clamp `Limit` to `1..30` before sending the request, so CLI behavior is explicit.
+- Tanso should clamp `Limit` to `1..30` before sending the request, so CLI behavior is explicit.
 
 Request example:
 
@@ -481,7 +481,7 @@ Result{
 }
 ```
 
-`ThumbnailUrl` and `Summary` are always returned by the provider. If either is an empty string, omit the corresponding optional Findo field.
+`ThumbnailUrl` and `Summary` are always returned by the provider. If either is an empty string, omit the corresponding optional Tanso field.
 
 Provider fields that are useful for `--raw`, diagnostics, or future metadata:
 
@@ -489,7 +489,7 @@ Provider fields that are useful for `--raw`, diagnostics, or future metadata:
 - `ThumbnailUrl`
 - item index/rank
 
-Findo should preserve hotlist order. The first provider item is rank 1.
+Tanso should preserve hotlist order. The first provider item is rank 1.
 
 ### Empty Results
 
@@ -516,7 +516,7 @@ Zero items is usable but empty.
 
 Provider response code mapping:
 
-| Zhihu code | Meaning | Findo code | Retryable |
+| Zhihu code | Meaning | Tanso code | Retryable |
 | --- | --- | --- | --- |
 | `0` | success | none | false |
 | `20001` | auth failed | `SOURCE_UNAUTHORIZED` | false |
@@ -528,7 +528,7 @@ Provider response code mapping:
 The following commands are not part of the v1.0.0 public contract and need official field-level specs before implementation:
 
 ```bash
-findo zhihu answer <query>
+tanso zhihu answer <query>
 ```
 
 Expected API keys from the official docs URLs:

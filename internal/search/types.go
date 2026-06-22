@@ -3,7 +3,7 @@ package search
 import (
 	"context"
 
-	"github.com/geekjourneyx/findo/internal/findoerr"
+	"github.com/geekjourneyx/tanso/internal/tansoerr"
 )
 
 type Capability string
@@ -134,7 +134,7 @@ type SourceStatus struct {
 	Results        int               `json:"results"`
 	EffectiveLimit int               `json:"effective_limit"`
 	DurationMS     int64             `json:"duration_ms"`
-	Error          *findoerr.Error   `json:"error"`
+	Error          *tansoerr.Error   `json:"error"`
 }
 
 type Envelope struct {
@@ -143,5 +143,5 @@ type Envelope struct {
 	Status       Status           `json:"status"`
 	Results      []Result         `json:"results"`
 	SourceStatus []SourceStatus   `json:"source_status"`
-	Errors       []findoerr.Error `json:"errors"`
+	Errors       []tansoerr.Error `json:"errors"`
 }

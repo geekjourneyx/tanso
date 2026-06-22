@@ -10,15 +10,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/geekjourneyx/findo/internal/config"
-	"github.com/geekjourneyx/findo/internal/findoerr"
-	"github.com/geekjourneyx/findo/internal/output"
-	"github.com/geekjourneyx/findo/internal/search"
-	"github.com/geekjourneyx/findo/internal/skillcontent"
-	sourcepkg "github.com/geekjourneyx/findo/internal/source"
-	"github.com/geekjourneyx/findo/internal/source/bocha"
-	"github.com/geekjourneyx/findo/internal/source/volcengine"
-	"github.com/geekjourneyx/findo/internal/source/zhihu"
+	"github.com/geekjourneyx/tanso/internal/config"
+	"github.com/geekjourneyx/tanso/internal/output"
+	"github.com/geekjourneyx/tanso/internal/search"
+	"github.com/geekjourneyx/tanso/internal/skillcontent"
+	sourcepkg "github.com/geekjourneyx/tanso/internal/source"
+	"github.com/geekjourneyx/tanso/internal/source/bocha"
+	"github.com/geekjourneyx/tanso/internal/source/volcengine"
+	"github.com/geekjourneyx/tanso/internal/source/zhihu"
+	"github.com/geekjourneyx/tanso/internal/tansoerr"
 )
 
 const (
@@ -57,11 +57,11 @@ func Run(args []string, version string, stdout, stderr io.Writer) int {
 		return ExitInvalidArgument
 	}
 	if p.Filter != "" && !isZhihuWebCommand(args) {
-		_, _ = fmt.Fprintln(stderr, "--filter is only valid for findo zhihu web")
+		_, _ = fmt.Fprintln(stderr, "--filter is only valid for tanso zhihu web")
 		return ExitInvalidArgument
 	}
 	if p.SearchDB != "" && !isZhihuWebCommand(args) {
-		_, _ = fmt.Fprintln(stderr, "--search-db is only valid for findo zhihu web")
+		_, _ = fmt.Fprintln(stderr, "--search-db is only valid for tanso zhihu web")
 		return ExitInvalidArgument
 	}
 	if err := validateOutputModes(p); err != nil {
@@ -73,7 +73,7 @@ func Run(args []string, version string, stdout, stderr io.Writer) int {
 		return ExitInvalidArgument
 	}
 	if (p.Path != "" || p.Force) && !isConfigInitCommand(p) {
-		_, _ = fmt.Fprintln(stderr, "--path and --force are only valid for findo config init")
+		_, _ = fmt.Fprintln(stderr, "--path and --force are only valid for tanso config init")
 		return ExitInvalidArgument
 	}
 	if len(args) == 0 || p.Command == "help" {
@@ -81,7 +81,7 @@ func Run(args []string, version string, stdout, stderr io.Writer) int {
 			_, _ = fmt.Fprintln(stderr, err.Error())
 			return ExitInvalidArgument
 		}
-		_, _ = fmt.Fprintln(stdout, "findo <query>")
+		_, _ = fmt.Fprintln(stdout, "tanso <query>")
 		return ExitOK
 	}
 	if p.Command == "version" {
@@ -93,7 +93,7 @@ func Run(args []string, version string, stdout, stderr io.Writer) int {
 			_, _ = fmt.Fprintf(stdout, `{"version":%q}`+"\n", version)
 			return ExitOK
 		}
-		_, _ = fmt.Fprintf(stdout, "findo %s\n", version)
+		_, _ = fmt.Fprintf(stdout, "tanso %s\n", version)
 		return ExitOK
 	}
 	if p.Command == "sources" {
@@ -363,7 +363,7 @@ func retrievalPlan(p parsed, cfg config.Config) (retrieval, error) {
 
 	switch p.Command {
 	case "bocha":
-		text, err := singleQuery(p.Positionals, "findo bocha")
+		text, err := singleQuery(p.Positionals, "tanso bocha")
 		if err != nil {
 			return retrieval{}, err
 		}
@@ -383,7 +383,7 @@ func retrievalPlan(p parsed, cfg config.Config) (retrieval, error) {
 		if len(args) > 0 && args[0] == "answer" {
 			args = args[1:]
 		}
-		text, err := singleQuery(args, "findo volc")
+		text, err := singleQuery(args, "tanso volc")
 		if err != nil {
 			return retrieval{}, err
 		}
@@ -400,11 +400,17 @@ func retrievalPlan(p parsed, cfg config.Config) (retrieval, error) {
 		}, nil
 	case "zhihu":
 		args := p.Positionals
+		if len(args) > 0 && args[0] == "hot" {
+			if len(args) != 1 {
+				return retrieval{}, fmt.Errorf("usage: tanso zhihu hot")
+			}
+			return zhihuHotRetrieval(cfg, limit), nil
+		}
 		global := len(args) > 0 && args[0] == "web"
 		if global {
 			args = args[1:]
 		}
-		text, err := singleQuery(args, "findo zhihu")
+		text, err := singleQuery(args, "tanso zhihu")
 		if err != nil {
 			return retrieval{}, err
 		}
@@ -431,28 +437,32 @@ func retrievalPlan(p parsed, cfg config.Config) (retrieval, error) {
 		}, nil
 	case "hot":
 		if len(p.Positionals) != 1 || p.Positionals[0] != "zhihu" {
-			return retrieval{}, fmt.Errorf("usage: findo hot zhihu")
+			return retrieval{}, fmt.Errorf("usage: tanso zhihu hot")
 		}
-		client := zhihu.Client{EndpointBase: cfg.Zhihu.EndpointBase, AccessSecret: cfg.Zhihu.AccessSecret}
-		return retrieval{
-			source:         search.SourceZhihuHot,
-			mode:           search.QueryModeHotlist,
-			requestedLimit: limit,
-			effectiveLimit: clamp(limit, 1, 30),
-			run: func(ctx context.Context) ([]search.Result, error) {
-				return client.Hotlist(ctx, search.HotlistQuery{Limit: limit, Language: cfg.Search.Language})
-			},
-		}, nil
+		return zhihuHotRetrieval(cfg, limit), nil
 	default:
 		return retrieval{}, fmt.Errorf("unknown command: %s", p.Command)
 	}
 }
 
+func zhihuHotRetrieval(cfg config.Config, limit int) retrieval {
+	client := zhihu.Client{EndpointBase: cfg.Zhihu.EndpointBase, AccessSecret: cfg.Zhihu.AccessSecret}
+	return retrieval{
+		source:         search.SourceZhihuHot,
+		mode:           search.QueryModeHotlist,
+		requestedLimit: limit,
+		effectiveLimit: clamp(limit, 1, 30),
+		run: func(ctx context.Context) ([]search.Result, error) {
+			return client.Hotlist(ctx, search.HotlistQuery{Limit: limit, Language: cfg.Search.Language})
+		},
+	}
+}
+
 func sourceStatus(source search.SourceID, effectiveLimit int, durationMS int64, results []search.Result, err error) search.SourceStatus {
 	status := search.SourceStatusOK
-	var ferr *findoerr.Error
+	var ferr *tansoerr.Error
 	if err != nil {
-		converted := toFindoError(source, err)
+		converted := toTansoError(source, err)
 		ferr = &converted
 		status = statusForError(converted)
 	}
@@ -466,34 +476,34 @@ func sourceStatus(source search.SourceID, effectiveLimit int, durationMS int64, 
 	}
 }
 
-func errorsFor(err error) []findoerr.Error {
+func errorsFor(err error) []tansoerr.Error {
 	if err == nil {
-		return []findoerr.Error{}
+		return []tansoerr.Error{}
 	}
-	var ferr findoerr.Error
+	var ferr tansoerr.Error
 	if errors.As(err, &ferr) {
-		return []findoerr.Error{ferr}
+		return []tansoerr.Error{ferr}
 	}
-	return []findoerr.Error{{Code: findoerr.InternalError, Message: err.Error(), Retryable: false}}
+	return []tansoerr.Error{{Code: tansoerr.InternalError, Message: err.Error(), Retryable: false}}
 }
 
-func toFindoError(source search.SourceID, err error) findoerr.Error {
-	var ferr findoerr.Error
+func toTansoError(source search.SourceID, err error) tansoerr.Error {
+	var ferr tansoerr.Error
 	if errors.As(err, &ferr) {
 		return ferr
 	}
-	return findoerr.Error{Code: findoerr.InternalError, Message: err.Error(), Source: string(source)}
+	return tansoerr.Error{Code: tansoerr.InternalError, Message: err.Error(), Source: string(source)}
 }
 
-func statusForError(err findoerr.Error) search.SourceStatusValue {
+func statusForError(err tansoerr.Error) search.SourceStatusValue {
 	switch err.Code {
-	case findoerr.CredentialMissing:
+	case tansoerr.CredentialMissing:
 		return search.SourceStatusSkipped
-	case findoerr.SourceTimeout:
+	case tansoerr.SourceTimeout:
 		return search.SourceStatusTimeout
-	case findoerr.SourceUnauthorized:
+	case tansoerr.SourceUnauthorized:
 		return search.SourceStatusUnauthorized
-	case findoerr.SourceRateLimited:
+	case tansoerr.SourceRateLimited:
 		return search.SourceStatusRateLimited
 	default:
 		return search.SourceStatusError
@@ -530,10 +540,10 @@ func validateHelp(p parsed) error {
 		return err
 	}
 	if p.JSON || p.Markdown || p.Table || p.Raw {
-		return fmt.Errorf("output flags are not valid for findo help")
+		return fmt.Errorf("output flags are not valid for tanso help")
 	}
 	if len(p.Positionals) > 0 {
-		return fmt.Errorf("unexpected argument for findo help: %s", p.Positionals[0])
+		return fmt.Errorf("unexpected argument for tanso help: %s", p.Positionals[0])
 	}
 	return nil
 }
@@ -543,10 +553,10 @@ func validateVersion(p parsed) error {
 		return err
 	}
 	if p.Markdown || p.Table || p.Raw {
-		return fmt.Errorf("only --json is valid for findo version")
+		return fmt.Errorf("only --json is valid for tanso version")
 	}
 	if len(p.Positionals) > 0 {
-		return fmt.Errorf("unexpected argument for findo version: %s", p.Positionals[0])
+		return fmt.Errorf("unexpected argument for tanso version: %s", p.Positionals[0])
 	}
 	return nil
 }
@@ -556,10 +566,10 @@ func validateSources(p parsed) error {
 		return err
 	}
 	if p.Markdown || p.Table || p.Raw {
-		return fmt.Errorf("only --json is valid for findo sources")
+		return fmt.Errorf("only --json is valid for tanso sources")
 	}
 	if len(p.Positionals) > 0 {
-		return fmt.Errorf("unexpected argument for findo sources: %s", p.Positionals[0])
+		return fmt.Errorf("unexpected argument for tanso sources: %s", p.Positionals[0])
 	}
 	return nil
 }
@@ -569,22 +579,22 @@ func validateSkills(p parsed) error {
 		return err
 	}
 	if len(p.Positionals) == 0 {
-		return fmt.Errorf("usage: findo skills <list|read>")
+		return fmt.Errorf("usage: tanso skills <list|read>")
 	}
 	switch p.Positionals[0] {
 	case "list":
 		if p.Markdown || p.Table || p.Raw {
-			return fmt.Errorf("only --json is valid for findo skills list")
+			return fmt.Errorf("only --json is valid for tanso skills list")
 		}
 		if len(p.Positionals) != 1 {
-			return fmt.Errorf("findo skills list takes no arguments")
+			return fmt.Errorf("tanso skills list takes no arguments")
 		}
 	case "read":
 		if p.Markdown || p.Table || p.Raw {
-			return fmt.Errorf("only --json is valid for findo skills read")
+			return fmt.Errorf("only --json is valid for tanso skills read")
 		}
 		if len(p.Positionals) < 2 || len(p.Positionals) > 3 {
-			return fmt.Errorf("usage: findo skills read <name>[/<path>] [path]")
+			return fmt.Errorf("usage: tanso skills read <name>[/<path>] [path]")
 		}
 	default:
 		return nil
@@ -597,35 +607,35 @@ func validateConfig(p parsed) error {
 		return err
 	}
 	if len(p.Positionals) == 0 {
-		return fmt.Errorf("usage: findo config <init|path|show>")
+		return fmt.Errorf("usage: tanso config <init|path|show>")
 	}
 	if len(p.Positionals) > 1 {
-		return fmt.Errorf("unexpected argument for findo config %s: %s", p.Positionals[0], p.Positionals[1])
+		return fmt.Errorf("unexpected argument for tanso config %s: %s", p.Positionals[0], p.Positionals[1])
 	}
 	switch p.Positionals[0] {
 	case "init":
 		if p.JSON || p.Markdown || p.Table || p.Raw {
-			return fmt.Errorf("output flags are not valid for findo config init")
+			return fmt.Errorf("output flags are not valid for tanso config init")
 		}
 		if p.ConfigPath != "" {
-			return fmt.Errorf("--config is not valid for findo config init; use --path")
+			return fmt.Errorf("--config is not valid for tanso config init; use --path")
 		}
 	case "path":
 		if p.JSON || p.Markdown || p.Table || p.Raw {
-			return fmt.Errorf("output flags are not valid for findo config path")
+			return fmt.Errorf("output flags are not valid for tanso config path")
 		}
 		if p.Path != "" || p.Force || p.ConfigPath != "" {
-			return fmt.Errorf("flags are not valid for findo config path")
+			return fmt.Errorf("flags are not valid for tanso config path")
 		}
 	case "show":
 		if !p.JSON {
-			return fmt.Errorf("only --json is valid for findo config show")
+			return fmt.Errorf("only --json is valid for tanso config show")
 		}
 		if p.Markdown || p.Table || p.Raw {
-			return fmt.Errorf("only --json is valid for findo config show")
+			return fmt.Errorf("only --json is valid for tanso config show")
 		}
 		if p.Path != "" || p.Force {
-			return fmt.Errorf("--path and --force are not valid for findo config show")
+			return fmt.Errorf("--path and --force are not valid for tanso config show")
 		}
 	default:
 		return nil

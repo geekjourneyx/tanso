@@ -8,13 +8,13 @@ import (
 	"testing"
 )
 
-func TestFindoBinaryVersionAndSources(t *testing.T) {
+func TestTansoBinaryVersionAndSources(t *testing.T) {
 	tmp := t.TempDir()
-	bin := filepath.Join(tmp, "findo")
+	bin := filepath.Join(tmp, "tanso")
 
-	build := exec.Command("go", "build", "-buildvcs=false", "-trimpath", "-o", bin, "./cmd/findo")
+	build := exec.Command("go", "build", "-buildvcs=false", "-trimpath", "-o", bin, "./cmd/tanso")
 	build.Dir = ".."
-	build.Env = append(os.Environ(), "GOCACHE=/tmp/findo-go-cache")
+	build.Env = append(os.Environ(), "GOCACHE=/tmp/tanso-go-cache")
 	if out, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("build failed: %v\n%s", err, out)
 	}
@@ -24,7 +24,7 @@ func TestFindoBinaryVersionAndSources(t *testing.T) {
 	if err != nil {
 		t.Fatalf("version failed: %v\n%s", err, out)
 	}
-	wantVersion := "findo " + makefileVersion(t)
+	wantVersion := "tanso " + makefileVersion(t)
 	if strings.TrimSpace(string(out)) != wantVersion {
 		t.Fatalf("version output = %q", out)
 	}

@@ -18,7 +18,7 @@ func TestVersionText(t *testing.T) {
 	if code != ExitOK {
 		t.Fatalf("exit code = %d, want %d", code, ExitOK)
 	}
-	if got, want := stdout.String(), "findo 1.0.0\n"; got != want {
+	if got, want := stdout.String(), "tanso 1.0.0\n"; got != want {
 		t.Fatalf("stdout = %q, want %q", got, want)
 	}
 	if got := stderr.String(); got != "" {
@@ -52,7 +52,7 @@ func TestInvalidSourceSpecificFlagOnWrongCommand(t *testing.T) {
 	if code != ExitInvalidArgument {
 		t.Fatalf("exit code = %d, want %d", code, ExitInvalidArgument)
 	}
-	if !strings.Contains(stderr.String(), "--filter is only valid for findo zhihu web") {
+	if !strings.Contains(stderr.String(), "--filter is only valid for tanso zhihu web") {
 		t.Fatalf("stderr = %q", stderr.String())
 	}
 }
@@ -66,7 +66,7 @@ func TestInvalidSearchDBOnWrongCommand(t *testing.T) {
 	if code != ExitInvalidArgument {
 		t.Fatalf("exit code = %d, want %d", code, ExitInvalidArgument)
 	}
-	if !strings.Contains(stderr.String(), "--search-db is only valid for findo zhihu web") {
+	if !strings.Contains(stderr.String(), "--search-db is only valid for tanso zhihu web") {
 		t.Fatalf("stderr = %q", stderr.String())
 	}
 }
@@ -80,12 +80,12 @@ func TestSourceSpecificFlagsInvalidOnInspectionCommands(t *testing.T) {
 		{
 			name: "version filter",
 			args: []string{"version", "--filter", "x"},
-			want: "--filter is only valid for findo zhihu web",
+			want: "--filter is only valid for tanso zhihu web",
 		},
 		{
 			name: "help search db",
 			args: []string{"help", "--search-db", "x"},
-			want: "--search-db is only valid for findo zhihu web",
+			want: "--search-db is only valid for tanso zhihu web",
 		},
 	}
 
@@ -178,7 +178,7 @@ func TestSkillsListJSON(t *testing.T) {
 	if got.Version != "1.2.0" || got.Count != 1 {
 		t.Fatalf("unexpected response: %#v", got)
 	}
-	if got.Skills[0].Name != "findo" || !strings.Contains(got.Skills[0].Description, "Chinese internet research") {
+	if got.Skills[0].Name != "tanso" || !strings.Contains(got.Skills[0].Description, "exploring Chinese internet signals") {
 		t.Fatalf("unexpected skill: %#v", got.Skills[0])
 	}
 	if got := stderr.String(); got != "" {
@@ -190,12 +190,12 @@ func TestSkillsReadRaw(t *testing.T) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
-	code := Run([]string{"skills", "read", "findo"}, "1.2.0", &stdout, &stderr)
+	code := Run([]string{"skills", "read", "tanso"}, "1.2.0", &stdout, &stderr)
 
 	if code != ExitOK {
 		t.Fatalf("exit code = %d, want %d; stderr=%q", code, ExitOK, stderr.String())
 	}
-	if !strings.HasPrefix(stdout.String(), "---\nname: findo") {
+	if !strings.HasPrefix(stdout.String(), "---\nname: tanso") {
 		t.Fatalf("stdout = %q", stdout.String())
 	}
 	if strings.Contains(stdout.String(), `"content"`) {
@@ -210,7 +210,7 @@ func TestSkillsReadJSON(t *testing.T) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
-	code := Run([]string{"skills", "read", "findo", "--json"}, "1.2.0", &stdout, &stderr)
+	code := Run([]string{"skills", "read", "tanso", "--json"}, "1.2.0", &stdout, &stderr)
 
 	if code != ExitOK {
 		t.Fatalf("exit code = %d, want %d; stderr=%q", code, ExitOK, stderr.String())
@@ -225,13 +225,13 @@ func TestSkillsReadJSON(t *testing.T) {
 	if err := json.Unmarshal(stdout.Bytes(), &got); err != nil {
 		t.Fatalf("unmarshal stdout: %v\n%s", err, stdout.String())
 	}
-	if got.Version != "1.2.0" || got.Skill != "findo" || got.Path != "SKILL.md" {
+	if got.Version != "1.2.0" || got.Skill != "tanso" || got.Path != "SKILL.md" {
 		t.Fatalf("unexpected response: %#v", got)
 	}
-	if !strings.Contains(got.Content, "Agent Native Go CLI") {
+	if !strings.Contains(got.Content, "AI Search CLI") {
 		t.Fatalf("content missing bundled skill: %.120q", got.Content)
 	}
-	if !strings.Contains(got.Guidance, "findo skills read findo --json") {
+	if !strings.Contains(got.Guidance, "tanso skills read tanso --json") {
 		t.Fatalf("guidance = %q", got.Guidance)
 	}
 	if got := stderr.String(); got != "" {
@@ -243,7 +243,7 @@ func TestSkillsReadRejectsTraversal(t *testing.T) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
-	code := Run([]string{"skills", "read", "findo", "../../etc/passwd"}, "1.2.0", &stdout, &stderr)
+	code := Run([]string{"skills", "read", "tanso", "../../etc/passwd"}, "1.2.0", &stdout, &stderr)
 
 	if code != ExitInvalidArgument {
 		t.Fatalf("exit code = %d, want %d", code, ExitInvalidArgument)
@@ -267,7 +267,7 @@ func TestConfigPath(t *testing.T) {
 	if code != ExitOK {
 		t.Fatalf("exit code = %d, want %d; stderr=%q", code, ExitOK, stderr.String())
 	}
-	want := filepath.Join(dir, "findo", "config.yaml") + "\n"
+	want := filepath.Join(dir, "tanso", "config.yaml") + "\n"
 	if got := stdout.String(); got != want {
 		t.Fatalf("stdout = %q, want %q", got, want)
 	}
@@ -278,7 +278,7 @@ func TestConfigPath(t *testing.T) {
 
 func TestConfigInitCreatesDefaultConfig(t *testing.T) {
 	dir := t.TempDir()
-	path := filepath.Join(dir, "findo.yaml")
+	path := filepath.Join(dir, "tanso.yaml")
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
@@ -310,7 +310,7 @@ func TestConfigInitCreatesDefaultConfig(t *testing.T) {
 }
 
 func TestConfigInitDoesNotOverwriteWithoutForce(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "findo.yaml")
+	path := filepath.Join(t.TempDir(), "tanso.yaml")
 	if err := os.WriteFile(path, []byte("existing"), 0600); err != nil {
 		t.Fatal(err)
 	}
@@ -331,7 +331,7 @@ func TestConfigInitDoesNotOverwriteWithoutForce(t *testing.T) {
 }
 
 func TestConfigInitForceOverwrites(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "findo.yaml")
+	path := filepath.Join(t.TempDir(), "tanso.yaml")
 	if err := os.WriteFile(path, []byte("existing"), 0600); err != nil {
 		t.Fatal(err)
 	}
@@ -353,7 +353,7 @@ func TestConfigInitForceOverwrites(t *testing.T) {
 }
 
 func TestConfigShowJSONRedactsSecrets(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "findo.yaml")
+	path := filepath.Join(t.TempDir(), "tanso.yaml")
 	err := os.WriteFile(path, []byte(`
 bocha:
   api_key: bocha-secret
@@ -429,7 +429,7 @@ func TestConfigShowRequiresJSON(t *testing.T) {
 func TestRetrievalReadsDefaultConfigPath(t *testing.T) {
 	dir := t.TempDir()
 	t.Setenv("XDG_CONFIG_HOME", dir)
-	path := filepath.Join(dir, "findo", "config.yaml")
+	path := filepath.Join(dir, "tanso", "config.yaml")
 	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
 		t.Fatal(err)
 	}
@@ -453,12 +453,12 @@ func TestPathAndForceRejectedOutsideConfigInit(t *testing.T) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
 
-	code := Run([]string{"bocha", "query", "--path", "findo.yaml"}, "1.0.0", &stdout, &stderr)
+	code := Run([]string{"bocha", "query", "--path", "tanso.yaml"}, "1.0.0", &stdout, &stderr)
 
 	if code != ExitInvalidArgument {
 		t.Fatalf("exit code = %d, want %d", code, ExitInvalidArgument)
 	}
-	if !strings.Contains(stderr.String(), "only valid for findo config init") {
+	if !strings.Contains(stderr.String(), "only valid for tanso config init") {
 		t.Fatalf("stderr = %q", stderr.String())
 	}
 }
@@ -496,6 +496,28 @@ func TestExplicitSourceMissingCredentialExitsCredential(t *testing.T) {
 	}
 	if !strings.Contains(stdout.String(), `"source":"bocha_web"`) {
 		t.Fatalf("stdout = %q", stdout.String())
+	}
+	if got := stderr.String(); got != "" {
+		t.Fatalf("stderr = %q, want empty", got)
+	}
+}
+
+func TestZhihuHotAlias(t *testing.T) {
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	t.Setenv("XDG_CONFIG_HOME", t.TempDir())
+	t.Setenv("ZHIHU_ACCESS_SECRET", "")
+
+	code := Run([]string{"zhihu", "hot", "--json"}, "1.0.0", &stdout, &stderr)
+
+	if code != ExitCredential {
+		t.Fatalf("exit = %d, want %d; stdout=%q stderr=%q", code, ExitCredential, stdout.String(), stderr.String())
+	}
+	out := stdout.String()
+	for _, want := range []string{`"mode":"hotlist"`, `"source":"zhihu_hot"`, `"code":"CREDENTIAL_MISSING"`} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("stdout missing %s: %s", want, out)
+		}
 	}
 	if got := stderr.String(); got != "" {
 		t.Fatalf("stderr = %q, want empty", got)

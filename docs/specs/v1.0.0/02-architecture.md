@@ -9,8 +9,8 @@ The design follows the reference project's successful split between CLI, config,
 ## Directory Layout
 
 ```text
-findo/
-├── cmd/findo/
+tanso/
+├── cmd/tanso/
 ├── internal/cli/
 ├── internal/config/
 ├── internal/search/
@@ -19,7 +19,7 @@ findo/
 │   ├── volcengine/
 │   └── zhihu/
 ├── internal/output/
-├── internal/findoerr/
+├── internal/tansoerr/
 ├── e2e/
 ├── scripts/
 ├── docs/
@@ -33,7 +33,7 @@ findo/
 
 ## Package Responsibilities
 
-### `cmd/findo`
+### `cmd/tanso`
 
 Owns only process entry:
 
@@ -53,7 +53,7 @@ Owns command parsing and command dispatch:
 - select output renderer
 - map top-level errors to exit codes
 
-The reference project uses a small custom CLI layer and only depends on YAML. Findo should start the same way unless command parsing becomes materially painful.
+The reference project uses a small custom CLI layer and only depends on YAML. Tanso should start the same way unless command parsing becomes materially painful.
 
 ### `internal/config`
 
@@ -92,7 +92,7 @@ Provider subpackages implement source-specific HTTP behavior:
 - `internal/source/volcengine`
 - `internal/source/zhihu`
 
-Adapters depend on `internal/search` and `internal/findoerr`, not on `internal/cli`.
+Adapters depend on `internal/search` and `internal/tansoerr`, not on `internal/cli`.
 
 ### `internal/output`
 
@@ -107,7 +107,7 @@ Output renderers consume normalized `search.Envelope`.
 
 Raw output is the exception: it consumes a redacted provider-shaped payload from the selected source adapter and must not route that payload through `search.Envelope`.
 
-### `internal/findoerr`
+### `internal/tansoerr`
 
 Owns stable errors:
 
@@ -183,7 +183,7 @@ type Hotlister interface {
 }
 ```
 
-Do not use `map[string]any` as the main query extension point. The reference project used parameter maps to support a broader research engine. Findo should keep typed contracts until a real source proves a typed field is impossible.
+Do not use `map[string]any` as the main query extension point. The reference project used parameter maps to support a broader research engine. Tanso should keep typed contracts until a real source proves a typed field is impossible.
 
 ### Query Types
 
@@ -303,11 +303,11 @@ Multi-source behavior:
 - Return `status=partial` when at least one source succeeds and another fails or is skipped.
 - Return `status=error` when no requested source returns usable results.
 
-The reference project's `internal/provider/multi` preserves source order with indexed result slices. Findo should use the same idea.
+The reference project's `internal/provider/multi` preserves source order with indexed result slices. Tanso should use the same idea.
 
 ## Error Model
 
-Provider errors are converted to stable Findo errors:
+Provider errors are converted to stable Tanso errors:
 
 ```go
 type Error struct {
@@ -321,7 +321,7 @@ type Error struct {
 }
 ```
 
-Stable codes are defined in `internal/findoerr`.
+Stable codes are defined in `internal/tansoerr`.
 
 Provider-specific guidance can be included in `Details` or verbose diagnostics, but the stable code must remain provider-neutral.
 
